@@ -1,22 +1,37 @@
 package org.andreaiacono.moviecatalog
 
+import android.graphics.Bitmap
+
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import kotlinx.android.synthetic.main.activity_scrolling.*
+import android.widget.GridView
+import org.andreaiacono.moviecatalog.util.RetrieveImagesTask
+import java.util.logging.Logger
+import org.andreaiacono.moviecatalog.util.ImageAdapter
 
-class ScrollingActivity : AppCompatActivity() {
+
+
+
+class ScrollingActivity : PostTaskListener<List<Bitmap>>, AppCompatActivity() {
+
+    private var logger: Logger = Logger.getAnonymousLogger()
+
+    override fun onPostTask(result: List<Bitmap>) {
+        logger.info("result: " + result)
+        this.imageGrid!!.setAdapter(ImageAdapter(this, result))
+    }
+
+    private var imageGrid: GridView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_scrolling)
-        setSupportActionBar(toolbar)
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
+        setContentView(R.layout.grid)
+//        setSupportActionBar(toolbar)
+        this.imageGrid = findViewById<GridView>(R.id.gridview)
+        RetrieveImagesTask(this).execute()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
