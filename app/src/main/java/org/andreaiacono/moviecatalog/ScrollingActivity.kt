@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.GridView
+import android.widget.Toast
 import org.andreaiacono.moviecatalog.util.RetrieveImagesTask
 import java.util.logging.Logger
 import org.andreaiacono.moviecatalog.util.ImageAdapter
@@ -18,9 +19,14 @@ class ScrollingActivity : PostTaskListener<List<Bitmap>>, AppCompatActivity() {
 
     private var logger: Logger = Logger.getAnonymousLogger()
 
-    override fun onPostTask(result: List<Bitmap>) {
-        logger.info("result: " + result)
-        this.imageGrid!!.setAdapter(ImageAdapter(this, result))
+    override fun onPostTask(result: List<Bitmap>, exception: Exception?) {
+        if (exception != null) {
+            val toast = Toast.makeText(applicationContext, "An error occurred while retrieving the images from network: ${exception.message}", Toast.LENGTH_LONG)
+            toast.show()
+        }
+        else {
+            this.imageGrid!!.setAdapter(ImageAdapter(this, result))
+        }
     }
 
     private var imageGrid: GridView? = null

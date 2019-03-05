@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import java.net.URL
 import org.andreaiacono.moviecatalog.PostTaskListener
-import java.util.logging.Level
 import java.util.logging.Logger
 
 
@@ -20,13 +19,9 @@ internal class RetrieveImagesTask(taskListener: PostTaskListener<List<Bitmap>>) 
 
     override fun doInBackground(vararg urls: String): Void? {
         try {
-            try {
-                val image = urlImageToBitmap("https://placehold.it/200x300")
-                for (i in 0..50) {
-                    bitmapList.add(image)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+            val image = urlImageToBitmap("https://placehold.it/200x300")
+            for (i in 0..50) {
+                bitmapList.add(image)
             }
         } catch (e: Exception) {
             this.exception = e
@@ -36,7 +31,8 @@ internal class RetrieveImagesTask(taskListener: PostTaskListener<List<Bitmap>>) 
 
     override fun onPostExecute(result: Void?) {
         super.onPostExecute(result)
-        postTaskListener.onPostTask(bitmapList)
+        postTaskListener.onPostTask(bitmapList, exception)
+
     }
 
     @Throws(Exception::class)
