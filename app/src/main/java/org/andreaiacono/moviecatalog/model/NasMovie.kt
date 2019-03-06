@@ -25,7 +25,7 @@ class NasMovie (
         pattern = "dd/MM/yyyy"
     )
     @JacksonXmlProperty(localName = "date")
-    val date: Date,
+    val date: Date = Date(0L),
 
     val dirName: String = ""
 )

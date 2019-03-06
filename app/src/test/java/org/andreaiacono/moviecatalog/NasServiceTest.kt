@@ -1,12 +1,10 @@
 package org.andreaiacono.moviecatalog
 
-import org.andreaiacono.moviecatalog.service.NasMovieService
+import org.andreaiacono.moviecatalog.service.NasService
 import org.junit.Test
 
-import org.junit.Assert.*
-import java.text.SimpleDateFormat
 
-class NasMovieServiceTest {
+class NasServiceTest {
     @Test
     fun parsing() {
 
@@ -40,9 +38,18 @@ class NasMovieServiceTest {
                 </details>
         """.trim()
 
-        val movie = NasMovieService().getMovie(xmlContent, "fooDir")
-        assertEquals("300", movie.title)
-        assertEquals("fooDir", movie.dirName)
-        assertEquals("06/09/2013", SimpleDateFormat("dd/MM/yyyy").format(movie.date))
+//        val movie = NasService("", "", "").getAllTitles(xmlContent, "fooDir")
+//        assertEquals("300", movie.title)
+//        assertEquals("fooDir", movie.dirName)
+//        assertEquals("06/09/2013", SimpleDateFormat("dd/MM/yyyy").format(movie.date))
     }
+
+
+    @Test
+    fun loading() {
+        val service = NasService("smb://192.168.1.90/Volume_1/movies/")
+        print(service.getAllTitles().joinToString { it.toString() })
+    }
+
+
 }

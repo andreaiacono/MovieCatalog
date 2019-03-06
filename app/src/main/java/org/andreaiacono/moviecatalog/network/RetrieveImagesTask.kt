@@ -11,12 +11,13 @@ import java.util.logging.Logger
 internal class NetworkImageLoader(taskListener: PostTaskListener<Bitmap>) : AsyncTask<String, Void, Void>() {
 
     private var logger: Logger = Logger.getAnonymousLogger()
-    private var exception: Exception? = null
+    private lateinit var exception: Exception
     private lateinit var bitmap: Bitmap
 
     private var postTaskListener: PostTaskListener<Bitmap> = taskListener
 
     override fun doInBackground(vararg url: String): Void? {
+        logger.fine("Loading image at $url")
         try {
             bitmap = urlImageToBitmap(url[0])
         }
