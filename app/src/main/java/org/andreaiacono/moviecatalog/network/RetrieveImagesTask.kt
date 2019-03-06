@@ -1,10 +1,10 @@
-package org.andreaiacono.moviecatalog.util
+package org.andreaiacono.moviecatalog.network
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import java.net.URL
-import org.andreaiacono.moviecatalog.PostTaskListener
+import org.andreaiacono.moviecatalog.util.PostTaskListener
 import java.util.logging.Logger
 
 
@@ -40,5 +40,9 @@ internal class RetrieveImagesTask(taskListener: PostTaskListener<List<Bitmap>>) 
         val url = URL(imageUrl)
         return BitmapFactory.decodeStream(url.openConnection().getInputStream())
     }
+
+
+//        return imageFile.inputStream.readBytes().toString()
+
 
 }

@@ -1,4 +1,4 @@
-package org.andreaiacono.moviecatalog
+package org.andreaiacono.moviecatalog.activity
 
 import android.graphics.Bitmap
 
@@ -8,14 +8,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.GridView
 import android.widget.Toast
-import org.andreaiacono.moviecatalog.util.RetrieveImagesTask
+import org.andreaiacono.moviecatalog.R
+import org.andreaiacono.moviecatalog.network.RetrieveImagesTask
 import java.util.logging.Logger
 import org.andreaiacono.moviecatalog.util.ImageAdapter
+import org.andreaiacono.moviecatalog.util.PostTaskListener
 
 
-
-
-class ScrollingActivity : PostTaskListener<List<Bitmap>>, AppCompatActivity() {
+class MainActivity : PostTaskListener<List<Bitmap>>, AppCompatActivity() {
 
     private var logger: Logger = Logger.getAnonymousLogger()
 
