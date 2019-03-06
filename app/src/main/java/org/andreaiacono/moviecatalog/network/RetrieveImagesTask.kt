@@ -8,22 +8,19 @@ import org.andreaiacono.moviecatalog.util.PostTaskListener
 import java.util.logging.Logger
 
 
-internal class RetrieveImagesTask(taskListener: PostTaskListener<List<Bitmap>>) :
-    AsyncTask<String, Void, Void>() {
+internal class NetworkImageLoader(taskListener: PostTaskListener<Bitmap>) : AsyncTask<String, Void, Void>() {
 
     private var logger: Logger = Logger.getAnonymousLogger()
     private var exception: Exception? = null
-    private var bitmapList: MutableList<Bitmap> = mutableListOf()
+    private lateinit var bitmap: Bitmap
 
-    private var postTaskListener: PostTaskListener<List<Bitmap>> = taskListener
+    private var postTaskListener: PostTaskListener<Bitmap> = taskListener
 
-    override fun doInBackground(vararg urls: String): Void? {
+    override fun doInBackground(vararg url: String): Void? {
         try {
-            val image = urlImageToBitmap("https://placehold.it/200x300")
-            for (i in 0..50) {
-                bitmapList.add(image)
-            }
-        } catch (e: Exception) {
+            bitmap = urlImageToBitmap(url[0])
+        }
+        catch (e: Exception) {
             this.exception = e
         }
         return null
@@ -31,18 +28,10 @@ internal class RetrieveImagesTask(taskListener: PostTaskListener<List<Bitmap>>) 
 
     override fun onPostExecute(result: Void?) {
         super.onPostExecute(result)
-        postTaskListener.onPostTask(bitmapList, exception)
+        postTaskListener.onPostTask(bitmap, exception)
 
     }
 
     @Throws(Exception::class)
-    private fun urlImageToBitmap(imageUrl: String): Bitmap {
-        val url = URL(imageUrl)
-        return BitmapFactory.decodeStream(url.openConnection().getInputStream())
-    }
-
-
-//        return imageFile.inputStream.readBytes().toString()
-
-
+    private fun urlImageToBitmap(imageUrl: String): Bitmap =BitmapFactory.decodeStream(URL(imageUrl).openConnection().getInputStream())
 }

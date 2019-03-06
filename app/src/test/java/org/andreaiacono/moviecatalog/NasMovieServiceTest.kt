@@ -1,24 +1,19 @@
 package org.andreaiacono.moviecatalog
 
-import org.andreaiacono.moviecatalog.util.XmlMovieMapper
+import org.andreaiacono.moviecatalog.service.NasMovieService
 import org.junit.Test
 
 import org.junit.Assert.*
 import java.text.SimpleDateFormat
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-class XmlMovieMapperTest {
+class NasMovieServiceTest {
     @Test
     fun parsing() {
 
         val xmlContent = """
             <?xml version="1.0"  encoding="UTF-8"?>
                 <details>
-                    <movie xmlns:xsi="http:--www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http:--www.w3.org/2001/XMLSchema">
+                    <nasMovie xmlns:xsi="http:--www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http:--www.w3.org/2001/XMLSchema">
                         <title>300</title>
                         <year>2007</year>
                         <rating>66</rating>
@@ -41,11 +36,11 @@ class XmlMovieMapperTest {
                             <actor>Frédéric Smith</actor>
                         </cast>
                         <filelink>Please enter the Dune path/300</filelink>
-                    </movie>
+                    </nasMovie>
                 </details>
         """.trim()
 
-        val movie = XmlMovieMapper().getMovie(xmlContent, "fooDir")
+        val movie = NasMovieService().getMovie(xmlContent, "fooDir")
         assertEquals("300", movie.title)
         assertEquals("fooDir", movie.dirName)
         assertEquals("06/09/2013", SimpleDateFormat("dd/MM/yyyy").format(movie.date))

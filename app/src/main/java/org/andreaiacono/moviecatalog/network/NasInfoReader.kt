@@ -3,21 +3,20 @@ package org.andreaiacono.moviecatalog.network
 import jcifs.smb.NtlmPasswordAuthentication
 import jcifs.smb.SmbFile
 import org.andreaiacono.moviecatalog.model.Movie
-import org.andreaiacono.moviecatalog.util.XmlMovieMapper
+import org.andreaiacono.moviecatalog.model.NasMovie
+import org.andreaiacono.moviecatalog.service.NasMovieService
 import java.util.*
 import java.util.logging.Logger
 
-
-data class MovieTitle(val title: String, val date: Date)
 
 class NasInfoReader(val url: String, val username: String, val password: String) {
 
     val auth = NtlmPasswordAuthentication("$username:$password")
 
-    private fun getTitles(alreadyPresentMovies: List<Movie>): List<Movie> {
+    private fun getTitles(alreadyPresentNasMovies: List<Movie>): List<Movie> {
 
-        val movies: MutableList<Movie> = mutableListOf()
-        val moviesDirs = alreadyPresentMovies.map{it.dirName}.toList()
+        val nasMovies: MutableList<NasMovie> = mutableListOf()
+        val moviesDirs = alreadyPresentNasMovies.map{it.dirName}.toList()
 
         val smb = SmbFile(url)
         for (file in smb.listFiles()) {
@@ -27,19 +26,20 @@ class NasInfoReader(val url: String, val username: String, val password: String)
 
                 val xmlFiles = file.listFiles().filter { it.name.endsWith(".xml") }.toList()
                 if (xmlFiles.isEmpty()) {
-                    movies.add(Movie(file.name, Date(file.date), file.name))
+                    nasMovies.add(NasMovie(file.name, Date(file.date), file.name))
                 }
                 else {
                     val xmlContent = xmlFiles[0].inputStream.readBytes().toString()
-                    movies.add(XmlMovieMapper().getMovie(xmlContent, file.name))
+                    nasMovies.add(NasMovieService().getMovie(xmlContent, file.name))
                 }
             }
         }
-        return movies
+
+        return nasMovies.map{ nasMovie -> Movie(nasMovie.title, nasMovie.date, nasMovie.dirName)}
     }
 
-    fun getNewTitles(movies: List<Movie>): List<Movie> {
-        return getTitles(movies)
+    fun getNewTitles(nasMovies: List<Movie>): List<Movie> {
+        return getTitles(nasMovies)
     }
 
     fun getAllTitles(): List<Movie> {
