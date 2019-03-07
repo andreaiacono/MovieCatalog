@@ -1,9 +1,10 @@
 package org.andreaiacono.moviecatalog.core
 
 import android.content.Context
+import android.provider.MediaStore
 import org.andreaiacono.moviecatalog.model.Movie
 import org.andreaiacono.moviecatalog.service.NasService
-import java.util.Comparator
+import java.util.*
 
 class MoviesCatalog(val ctx: Context, nasUrl: String) {
 
@@ -17,10 +18,43 @@ class MoviesCatalog(val ctx: Context, nasUrl: String) {
 
     var nasService: NasService = NasService(nasUrl)
 
+    var sortingGenre: String = "No Filter"
 
     fun scanMovies() =  nasService.getAllTitles()
 
     fun getCount() = movies.size
+    fun getSampleGenres(): List<String> {
+        return listOf(
+            "Disaster",
+            "Drama",
+            "Romantic",
+            "Educational",
+            "Fantasy",
+            "Gangster",
+            "History",
+            "Horror",
+            "Military",
+            "Mystery",
+            "Nature",
+            "Documentary",
+            "Politics",
+            "Road movie",
+            "Romance",
+            "Science",
+            "Science fiction",
+            "Spiritual",
+            "Sports",
+            "Spy",
+            "Teen",
+            "Variety",
+            "War"
+        )
+    }
+    fun getGenres(): List<String> = getSampleGenres()
+
+    fun setGenreFilter(genre: String) {
+        sortingGenre = genre
+    }
 }
 
 private enum class MovieComparator : Comparator<Movie> {

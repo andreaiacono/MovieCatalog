@@ -7,8 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.GridView
-import android.widget.Toast
+import android.widget.*
 import org.andreaiacono.moviecatalog.R
 import org.andreaiacono.moviecatalog.core.MoviesCatalog
 import org.andreaiacono.moviecatalog.activity.task.MovieLoaderTask
@@ -24,6 +23,8 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
     private var logger: Logger = Logger.getAnonymousLogger()
 
     private lateinit var imageGrid: GridView
+//    var genresListView: ListView? = null
+
     lateinit var moviesCatalog: MoviesCatalog
 
     override fun onPostTask(result: Any, asyncTaskType: AsyncTaskType, exception: Exception?) {
@@ -56,6 +57,15 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 //        NetworkImageLoaderTask(this).execute()
         val myToolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(myToolbar)
+
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, moviesCatalog.getGenres())
+        val genresListView: ListView = findViewById(R.id.genresListView)
+        genresListView.adapter = adapter
+        genresListView.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, i, l ->
+            moviesCatalog.setGenreFilter(genresListView.getAdapter().getItem(i).toString())
+//            imageAdapter.notifyDataSetChanged()
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
