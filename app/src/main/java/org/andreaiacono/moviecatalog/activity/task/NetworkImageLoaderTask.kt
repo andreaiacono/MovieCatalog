@@ -1,20 +1,23 @@
-package org.andreaiacono.moviecatalog.network
+package org.andreaiacono.moviecatalog.activity.task
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
+import org.andreaiacono.moviecatalog.ui.AsyncTaskType
 import java.net.URL
-import org.andreaiacono.moviecatalog.util.PostTaskListener
+import org.andreaiacono.moviecatalog.ui.PostTaskListener
 import java.util.logging.Logger
 
 
-internal class NetworkImageLoader(taskListener: PostTaskListener<Bitmap>) : AsyncTask<String, Void, Void>() {
+internal class NetworkImageLoaderTask(taskListener: PostTaskListener<Any>) : AsyncTask<String, Void, Void>() {
+
+    private val syncTaskType: AsyncTaskType = AsyncTaskType.INTERNET_IMAGE_LOAD
 
     private var logger: Logger = Logger.getAnonymousLogger()
     private lateinit var exception: Exception
     private lateinit var bitmap: Bitmap
 
-    private var postTaskListener: PostTaskListener<Bitmap> = taskListener
+    private var postTaskListener: PostTaskListener<Any> = taskListener
 
     override fun doInBackground(vararg url: String): Void? {
         logger.fine("Loading image at $url")
@@ -23,14 +26,14 @@ internal class NetworkImageLoader(taskListener: PostTaskListener<Bitmap>) : Asyn
         }
         catch (e: Exception) {
             this.exception = e
+            logger.severe("Error while loading image $url: ${e.message}")
         }
         return null
     }
 
     override fun onPostExecute(result: Void?) {
         super.onPostExecute(result)
-        postTaskListener.onPostTask(bitmap, exception)
-
+        postTaskListener.onPostTask(bitmap, syncTaskType, exception)
     }
 
     @Throws(Exception::class)

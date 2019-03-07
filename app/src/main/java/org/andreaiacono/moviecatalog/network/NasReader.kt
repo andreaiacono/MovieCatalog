@@ -1,20 +1,13 @@
 package org.andreaiacono.moviecatalog.network
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.dataformat.xml.XmlMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import jcifs.smb.SmbFile
-import org.andreaiacono.moviecatalog.model.Details
 import org.andreaiacono.moviecatalog.model.Movie
+import org.andreaiacono.moviecatalog.model.NasMovie
 import java.util.*
 import java.util.logging.Logger
 
 
 class NasReader(val url: String) {
-
-    private val kotlinXmlMapper = XmlMapper()
-        .registerKotlinModule()
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     private fun getMovies(alreadyPresentNasMovies: List<Movie>): List<Movie> {
 
@@ -22,7 +15,7 @@ class NasReader(val url: String) {
         val moviesDirs = alreadyPresentNasMovies.map { it.dirName }.toList()
 
         val smb = SmbFile(url)
-        for (file in smb.listFiles()) {
+        for (file in smb.listFiles().take(1)) {
 
             Logger.getAnonymousLogger().fine("Reading file ${file.name}")
             if (file.isDirectory && !moviesDirs.contains(file.name)) {
@@ -32,7 +25,7 @@ class NasReader(val url: String) {
                 }
                 else {
                     val xmlContent = xmlFiles[0].inputStream.readBytes().toString(Charsets.UTF_8)
-                    val nasMovie = kotlinXmlMapper.readValue(xmlContent, Details::class.java).movie
+                    val nasMovie = NasMovie("fake", Date(0), "foo")
                     moviesXml.add(
                         Movie(
                             nasMovie.title,
