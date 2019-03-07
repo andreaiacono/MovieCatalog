@@ -2,6 +2,7 @@ package org.andreaiacono.moviecatalog.activity
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
@@ -59,7 +60,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_scrolling, menu)
+        menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 
@@ -68,6 +69,17 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_scan -> {
                 MovieLoaderTask(this, NasService("smb://192.168.1.90/Volume_1/movies/")).execute()
+                true
+            }
+            R.id.action_info -> {
+                val builder = AlertDialog.Builder(this)
+                val ip = "192.168.1.0"
+                val message = "Ip Address Dune HD: $ip" +
+                "\nAPI version: 5" +
+                "\nMovies number: " + moviesCatalog.getCount()
+                builder.setMessage(message).setTitle(R.string.info_title)
+                val dialog = builder.create()
+                dialog.show()
                 true
             }
             else -> super.onOptionsItemSelected(item)

@@ -7,4 +7,9 @@
           android:title="@string/action_scan"
           android:orderInCategory="100"
           app:showAsAction="never"/>
+
+    <item android:id="@+id/action_info"
+        android:title="@string/action_info"
+        android:orderInCategory="100"
+        app:showAsAction="never"/>
 </menu>

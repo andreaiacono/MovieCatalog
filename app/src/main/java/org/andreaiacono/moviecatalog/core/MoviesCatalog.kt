@@ -11,7 +11,7 @@ class MoviesCatalog(val ctx: Context, nasUrl: String) {
     private var genericFilter: String? = null
     private var genres: MutableList<String>? = null
     private var genresArray: Array<String>? = null
-    private var movies: MutableList<Movie>? = null
+    private val movies: MutableList<Movie> = mutableListOf()
     private var displayedMovies: MutableList<Movie>? = null
     private var comparator: Comparator<Movie> = MovieComparator.BY_DATE_DESC
 
@@ -19,6 +19,8 @@ class MoviesCatalog(val ctx: Context, nasUrl: String) {
 
 
     fun scanMovies() =  nasService.getAllTitles()
+
+    fun getCount() = movies.size
 }
 
 private enum class MovieComparator : Comparator<Movie> {
