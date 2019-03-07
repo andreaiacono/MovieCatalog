@@ -1,36 +1,44 @@
 package org.andreaiacono.moviecatalog.network
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.dataformat.xml.XmlMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import jcifs.smb.SmbFile
+import org.andreaiacono.moviecatalog.model.Details
 import org.andreaiacono.moviecatalog.model.Movie
-import org.andreaiacono.moviecatalog.model.NasMovie
 import java.util.*
 import java.util.logging.Logger
 
 
 class NasReader(val url: String) {
 
+    private val kotlinXmlMapper = XmlMapper()
+        .registerKotlinModule()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
     private fun getMovies(alreadyPresentNasMovies: List<Movie>): List<Movie> {
 
         val moviesXml: MutableList<Movie> = mutableListOf()
-        val moviesDirs = alreadyPresentNasMovies.map { it.dirName }.toList()
+        val existingMoviesDirs = alreadyPresentNasMovies.map { it.dirName }.toList()
 
-        val smb = SmbFile(url)
-        for (file in smb.listFiles().take(1)) {
+        val moviesRoot = SmbFile(url)
+        for (movieDir in moviesRoot.listFiles().take(1)) {
 
-            Logger.getAnonymousLogger().fine("Reading file ${file.name}")
-            if (file.isDirectory && !moviesDirs.contains(file.name)) {
-                val xmlFiles = file.listFiles().filter { it.name.endsWith(".xml") }.toList()
+            Logger.getAnonymousLogger().fine("Reading file ${movieDir.name}")
+            if (movieDir.isDirectory && !existingMoviesDirs.contains(movieDir.name)) {
+                val xmlFiles = movieDir.listFiles().filter { it.name.endsWith(".xml") }.toList()
                 if (xmlFiles.isEmpty()) {
-                    moviesXml.add(Movie(file.name, Date(file.date), file.name))
+                    moviesXml.add(Movie(movieDir.name, Date(movieDir.date), movieDir.name))
                 }
                 else {
+                    // assumes there's only one xml file in each dir
                     val xmlContent = xmlFiles[0].inputStream.readBytes().toString(Charsets.UTF_8)
-                    val nasMovie = NasMovie("fake", Date(0), "foo")
+                    val nasMovie = kotlinXmlMapper.readValue(xmlContent, Details::class.java).movie
                     moviesXml.add(
                         Movie(
                             nasMovie.title,
-                            if (nasMovie.date.time != 0L) nasMovie.date else Date(file.date),
-                            file.name
+                            if (nasMovie.date.time > 0L) nasMovie.date else Date(movieDir.date),
+                            movieDir.name
                         )
                     )
                 }
