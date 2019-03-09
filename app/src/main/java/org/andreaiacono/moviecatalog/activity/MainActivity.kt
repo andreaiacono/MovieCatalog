@@ -57,14 +57,17 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                     moviesCatalog.saveCatalog()
                 }
                 AsyncTaskType.FILE_SYSTEM_IMAGE_LOAD -> {
-                    val bitmaps =  result as List<Bitmap>
+                    val bitmaps = result as List<Bitmap>
                     Log.d(LOG_TAG, "$bitmaps")
                     if (!bitmaps.isEmpty()) {
                         imageGrid.adapter = ImageAdapter(this, bitmaps)
-                    }
-                    else {
+                    } else {
                         // dialog for asking to scan?
                     }
+                }
+                AsyncTaskType.DUNE_HD_COMMANDER -> {
+                    val toast = Toast.makeText(applicationContext, result.toString(), Toast.LENGTH_SHORT)
+                    toast.show()
                 }
             }
     }
@@ -74,7 +77,14 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
         imageGrid = findViewById(R.id.moviesGridView)
-        moviesCatalog = MoviesCatalog(this, "smb://192.168.1.90/Volume_1/movies/", "http://www.omdbapi.com/", "13c1fc2a")
+        moviesCatalog =
+            MoviesCatalog(
+                this,
+                "smb://192.168.1.90/Volume_1/movies/",
+                "http://www.omdbapi.com/",
+                "13c1fc2a",
+                "192.168.1.83"
+            )
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)

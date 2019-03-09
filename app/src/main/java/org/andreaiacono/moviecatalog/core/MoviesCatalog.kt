@@ -7,13 +7,14 @@ import android.graphics.Bitmap
 import android.util.Log
 import org.andreaiacono.moviecatalog.model.Movie
 import org.andreaiacono.moviecatalog.model.Search
+import org.andreaiacono.moviecatalog.service.DuneHdService
 import org.andreaiacono.moviecatalog.service.NasService
 import org.andreaiacono.moviecatalog.service.OpenMovieService
 import org.andreaiacono.moviecatalog.util.MOVIE_CATALOG_FILENAME
 import java.io.*
 import java.util.*
 
-class MoviesCatalog(val main: Activity, nasUrl: String, openMovieUrl: String, openMovieApiKey: String) {
+class MoviesCatalog(val main: Activity, nasUrl: String, openMovieUrl: String, openMovieApiKey: String, duneIp: String) {
 
     val LOG_TAG = this.javaClass.name
     val ALL_GENRES = "No Filter"
@@ -26,9 +27,9 @@ class MoviesCatalog(val main: Activity, nasUrl: String, openMovieUrl: String, op
     var movies: List<Movie> = listOf()
     private var comparator: Comparator<Movie> = MovieComparator.BY_DATE_DESC
 
-    var nasService: NasService = NasService(nasUrl)
-
-    var openMovieService: OpenMovieService = OpenMovieService(openMovieUrl, openMovieApiKey)
+    val nasService: NasService = NasService(nasUrl)
+    val openMovieService: OpenMovieService = OpenMovieService(openMovieUrl, openMovieApiKey)
+    val duneHdService: DuneHdService = DuneHdService(duneIp, nasUrl)
 
     var sortingGenre: String = ALL_GENRES
 
