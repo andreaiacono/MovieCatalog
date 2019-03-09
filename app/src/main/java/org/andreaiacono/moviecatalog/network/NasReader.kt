@@ -43,6 +43,7 @@ class NasReader(val url: String) {
                                 xmlMovie.title,
                                 xmlMovie.sortingTitle ?: xmlMovie.title,
                                 if (xmlMovie.date.time > 0L) xmlMovie.date else Date(movieDir.date),
+                                xmlMovie.genres,
                                 movieDir.name
                             )
                         )
