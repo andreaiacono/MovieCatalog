@@ -17,15 +17,10 @@ class DuneHdService(duneIp: String, nasUrl: String) {
     val LOG_TAG = this.javaClass.name
     val url = "http://$duneIp/cgi-bin/do?cmd=start_playlist_playback&media_url=$nasUrl"
 
-    private val jsonMapper = jacksonObjectMapper()
-        .registerKotlinModule()
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-
-
     fun startMovie(movieDir: String, movieFilename: String): String {
         val fullFilename = "$url/$movieDir/$movieFilename"
         Log.d(LOG_TAG, "Starting $fullFilename")
-        return URL("$fullFilename").readText()
+        return URL(fullFilename).readText()
     }
 
 }

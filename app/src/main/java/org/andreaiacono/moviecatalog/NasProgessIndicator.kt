@@ -2,10 +2,8 @@
 //
 //import android.content.Context
 //import android.os.Message
-//import java.util.ArrayList
 //
-//class Mede8erScannerProgressIndicator(context: Context) {
-//
+//class ScannerProgressIndicator(context: Context) {
 //    private var initialized: Boolean = false
 //    private var scanStep: Int = 0
 //    private var elementCounter: Int = 0
