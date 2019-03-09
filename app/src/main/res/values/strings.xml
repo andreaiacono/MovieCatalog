@@ -3,4 +3,6 @@
     <string name="action_scan">Scan</string>
     <string name="action_info">Info</string>
     <string name="info_title">Information</string>
+    <string name="delete_info">Delete all data</string>
+    <string name="list_files">List files</string>
 </resources>

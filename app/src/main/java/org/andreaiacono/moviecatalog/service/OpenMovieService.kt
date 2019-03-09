@@ -6,9 +6,12 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.andreaiacono.moviecatalog.model.ApiMovie
 import org.andreaiacono.moviecatalog.model.Search
 import org.andreaiacono.moviecatalog.network.OpenMovieReader
+import java.util.logging.Logger
 
 
 class OpenMovieService(url: String, apiKey: String) {
+
+    private var logger: Logger = Logger.getLogger(this.javaClass.name)
 
     private val service = OpenMovieReader(url, apiKey)
     private val jsonMapper = jacksonObjectMapper()
@@ -18,6 +21,7 @@ class OpenMovieService(url: String, apiKey: String) {
 
     fun searchMovie(title: String): Search {
         val jsonResult = service.searchMovieInfo(title)
+        logger.severe("result for $title = $jsonResult")
         return jsonMapper.readValue(jsonResult, Search::class.java)
     }
 

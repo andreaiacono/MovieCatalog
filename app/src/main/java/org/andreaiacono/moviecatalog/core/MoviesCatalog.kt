@@ -1,59 +1,95 @@
 package org.andreaiacono.moviecatalog.core
 
+import android.app.Activity
+
 import android.content.Context
-import android.provider.MediaStore
+import android.graphics.Bitmap
+import android.util.Log
 import org.andreaiacono.moviecatalog.model.Movie
+import org.andreaiacono.moviecatalog.model.Search
 import org.andreaiacono.moviecatalog.service.NasService
+import org.andreaiacono.moviecatalog.service.OpenMovieService
+import org.andreaiacono.moviecatalog.util.MOVIE_CATALOG_FILENAME
+import java.io.*
 import java.util.*
 
-class MoviesCatalog(val ctx: Context, nasUrl: String) {
+class MoviesCatalog(val main: Activity, nasUrl: String, openMovieUrl: String, openMovieApiKey: String) {
 
-    private var genreFilter: String? = null
-    private var genericFilter: String? = null
-    private var genres: MutableList<String>? = null
-    private var genresArray: Array<String>? = null
-    private val movies: MutableList<Movie> = mutableListOf()
-    private var displayedMovies: MutableList<Movie>? = null
+    val LOG_TAG = this.javaClass.name
+    val ALL_GENRES = "No Filter"
+
+    val THUMBS_DIR = "thumbs"
+    private var genreFilter: String = ALL_GENRES
+    var genericFilter: String = ALL_GENRES
+    var genres: List<String> = listOf()
+
+    var movies: List<Movie> = listOf()
     private var comparator: Comparator<Movie> = MovieComparator.BY_DATE_DESC
 
     var nasService: NasService = NasService(nasUrl)
 
-    var sortingGenre: String = "No Filter"
+    var openMovieService: OpenMovieService = OpenMovieService(openMovieUrl, openMovieApiKey)
 
-    fun scanMovies() =  nasService.getAllTitles()
+    var sortingGenre: String = ALL_GENRES
+
+    init {
+        loadCatalog()
+        genres = movies.flatMap { it.genres }.toList()
+        Log.d(LOG_TAG, "Loaded movies: $movies")
+        Log.d(LOG_TAG, "Loaded genres: $genres")
+    }
 
     fun getCount() = movies.size
-    fun getSampleGenres(): List<String> {
-        return listOf(
-            "Disaster",
-            "Drama",
-            "Romantic",
-            "Educational",
-            "Fantasy",
-            "Gangster",
-            "History",
-            "Horror",
-            "Military",
-            "Mystery",
-            "Nature",
-            "Documentary",
-            "Politics",
-            "Road movie",
-            "Romance",
-            "Science",
-            "Science fiction",
-            "Spiritual",
-            "Sports",
-            "Spy",
-            "Teen",
-            "Variety",
-            "War"
-        )
-    }
-    fun getGenres(): List<String> = getSampleGenres()
 
     fun setGenreFilter(genre: String) {
         sortingGenre = genre
+    }
+
+    fun searchMovie(title: String): Search {
+        return openMovieService.searchMovie(title)
+    }
+
+    fun saveCatalog() {
+        val catalogFileName = "${main.application.applicationContext.filesDir}/$MOVIE_CATALOG_FILENAME"
+        try {
+            Log.d(LOG_TAG, "Saving $movies to $catalogFileName")
+            ObjectOutputStream(FileOutputStream(catalogFileName)).use { it.writeObject(movies) }
+        }
+        catch (ex: Exception) {
+            Log.e(LOG_TAG, "No catalog file $catalogFileName on device.")
+        }
+    }
+
+    fun loadCatalog() {
+        val catalogFileName = "${main.application.applicationContext.filesDir}/$MOVIE_CATALOG_FILENAME"
+        try {
+            ObjectInputStream(FileInputStream(catalogFileName)).use {
+                val catalog = it.readObject()
+                when (catalog) {
+                    is List<*> -> movies = catalog as List<Movie>
+                    else -> {
+                        Log.e(LOG_TAG, "Deserialization failed.")
+                    }
+                }
+            }
+        } catch (ex: Exception) {
+            Log.e(LOG_TAG, "No catalog file $catalogFileName on device.")
+        }
+    }
+
+    fun saveBitmap(thumbFilename: String, image: Bitmap) {
+        try {
+            main.application.applicationContext.openFileOutput(thumbFilename, Context.MODE_PRIVATE).use {
+                image.compress(Bitmap.CompressFormat.PNG, 92, it)
+            }
+        } catch (ex: Exception) {
+            Log.e(LOG_TAG, "An error has occurred saving bitmap on [$thumbFilename]: ${ex.message}")
+        }
+    }
+
+    fun deleteAll() {
+        val ctx = main.application.applicationContext
+        ctx.getFilesDir().listFiles().forEach { it.delete() }
     }
 }
 

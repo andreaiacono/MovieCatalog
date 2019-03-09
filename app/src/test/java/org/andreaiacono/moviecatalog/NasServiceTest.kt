@@ -48,7 +48,7 @@ class NasServiceTest {
     @Test
     fun loading() {
         val service = NasService("smb://192.168.1.90/Volume_1/movies/")
-        print(service.getAllTitles()[0].title)
+//        print(service.getFullImage()
 //        print(service.getAllTitles().joinToString { it.toString() })
     }
 

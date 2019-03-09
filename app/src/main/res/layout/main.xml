@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!--<GridView xmlns:android="http://schemas.android.com/apk/res/android"--><!--android:id="@+id/gridview"--><!--android:layout_width="match_parent"--><!--android:layout_height="match_parent"--><!--android:gravity="center"--><!--android:horizontalSpacing="5dp"--><!--android:numColumns="@integer/column_count"--><!--android:stretchMode="columnWidth"--><!--android:verticalSpacing="5dp" />-->
-
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/gridview"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     android:background="?attr/colorPrimaryDark"
+    android:fitsSystemWindows="true"
     tools:context=".activity.MainActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -24,30 +22,28 @@
             app:layout_scrollFlags="scroll|enterAlways" />
     </android.support.design.widget.AppBarLayout>
 
-    <!--<android.support.v4.view.ViewPager-->
-        <!--android:id="@+id/vpPager"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:background="?attr/colorPrimaryDark"-->
-        <!--app:layout_behavior="@string/appbar_scrolling_view_behavior">-->
+    <ListView
+        android:id="@+id/genresListView"
+        android:layout_width="180dp"
+        android:layout_height="fill_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_weight="1" />
 
-        <ListView
-            android:id="@+id/genresListView"
-            android:layout_width="180dp"
-            android:layout_height="fill_parent"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true" />
+    <GridView
+        android:id="@+id/moviesGridView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignBottom="@+id/genresListView"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/genresListView"
+        android:columnWidth="220dp"
+        android:numColumns="auto_fit" />
 
-        <GridView
-            android:id="@+id/moviesGridView"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_alignBottom="@+id/genresListView"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/genresListView"
-            android:columnWidth="220dp"
-            android:numColumns="auto_fit" />
-    <!--</android.support.v4.view.ViewPager>-->
+    <ProgressBar
+        android:id="@+id/nasProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </android.support.design.widget.CoordinatorLayout>

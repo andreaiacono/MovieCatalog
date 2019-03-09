@@ -12,13 +12,13 @@ import android.view.ViewGroup
 
 
 
-class ImageAdapter(private val context: Context, private val bitmapList: List<Bitmap>) : BaseAdapter() {
+class ImageAdapter(val context: Context, val bitmapList: List<Bitmap>) : BaseAdapter() {
 
     override fun getCount(): Int = bitmapList.size
 
-    override fun getItem(position: Int): Any? = null
+    override fun getItem(position: Int): Any? = bitmapList[position]
 
-    override fun getItemId(position: Int) = 0L
+    override fun getItemId(position: Int) = position.toLong()
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val imageView: ImageView
@@ -35,7 +35,7 @@ class ImageAdapter(private val context: Context, private val bitmapList: List<Bi
             imageView.scaleType = ImageView.ScaleType.CENTER_CROP
             imageView.setPadding(8, 8, 4, 16)
 
-//            imageView.setBackgroundColor(Color.BLUE)
+            imageView.setBackgroundColor(Color.BLUE)
         } else {
             imageView = convertView as ImageView
         }

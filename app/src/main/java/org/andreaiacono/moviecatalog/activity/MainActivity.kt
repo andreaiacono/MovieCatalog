@@ -5,43 +5,66 @@ import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
-import org.andreaiacono.moviecatalog.R
 import org.andreaiacono.moviecatalog.core.MoviesCatalog
-import org.andreaiacono.moviecatalog.activity.task.MovieLoaderTask
-import org.andreaiacono.moviecatalog.service.NasService
+import org.andreaiacono.moviecatalog.model.Movie
 import org.andreaiacono.moviecatalog.ui.AsyncTaskType
-import java.util.logging.Logger
 import org.andreaiacono.moviecatalog.util.ImageAdapter
 import org.andreaiacono.moviecatalog.ui.PostTaskListener
-
+import org.andreaiacono.moviecatalog.R
+import org.andreaiacono.moviecatalog.activity.task.FileSystemImageLoaderTask
+import org.andreaiacono.moviecatalog.activity.task.NasScanningTask
+import org.andreaiacono.moviecatalog.model.NasMovie
+import org.andreaiacono.moviecatalog.util.thumbNameNormalizer
 
 class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
-    private var logger: Logger = Logger.getAnonymousLogger()
+    val LOG_TAG = this.javaClass.name
 
     private lateinit var imageGrid: GridView
-//    var genresListView: ListView? = null
-
-    lateinit var moviesCatalog: MoviesCatalog
+    private lateinit var moviesCatalog: MoviesCatalog
 
     override fun onPostTask(result: Any, asyncTaskType: AsyncTaskType, exception: Exception?) {
 
         if (exception != null) {
-            val toast = Toast.makeText(applicationContext, "An error occurred: ${exception.message}", Toast.LENGTH_LONG)
+            Log.d(LOG_TAG, exception.message, exception)
+            val toast = Toast.makeText(
+                applicationContext,
+                "An error occurred while executing $asyncTaskType: ${exception.message}",
+                Toast.LENGTH_LONG
+            )
             toast.show()
         } else
             when (asyncTaskType) {
-                AsyncTaskType.INTERNET_IMAGE_LOAD -> {
-                    this.imageGrid.setAdapter(ImageAdapter(this, result as List<Bitmap>))
+                AsyncTaskType.NAS_IMAGE_LOAD -> {
+//                    this.imageGrid.adapter = ImageAdapter(this, result as List<Bitmap>)
                 }
                 AsyncTaskType.NAS_SCAN -> {
-
+                    moviesCatalog.movies = (result as List<NasMovie>)
+                        .map {
+                            Movie(
+                                it.title,
+                                it.date,
+                                it.dirName,
+                                it.genres,
+                                thumbNameNormalizer(it.title)
+                            )
+                        }
+                        .toList()
+                    moviesCatalog.saveCatalog()
                 }
-                AsyncTaskType.DEVICE_IMAGE_LOAD -> {
-
+                AsyncTaskType.FILE_SYSTEM_IMAGE_LOAD -> {
+                    val bitmaps =  result as List<Bitmap>
+                    Log.d(LOG_TAG, "$bitmaps")
+                    if (!bitmaps.isEmpty()) {
+                        imageGrid.adapter = ImageAdapter(this, bitmaps)
+                    }
+                    else {
+                        // dialog for asking to scan?
+                    }
                 }
             }
     }
@@ -50,26 +73,23 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
-        Logger.getAnonymousLogger().fine("Main onCreate")
-        moviesCatalog = MoviesCatalog(this.application.applicationContext, "smb://192.168.1.90/Volume_1/movies/")
-//        setSupportActionBar(toolbar)
-//        this.imageGrid = findViewById(R.id.gridview)
-//        NetworkImageLoaderTask(this).execute()
-        val myToolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(myToolbar)
+        imageGrid = findViewById(R.id.moviesGridView)
+        moviesCatalog = MoviesCatalog(this, "smb://192.168.1.90/Volume_1/movies/", "http://www.omdbapi.com/", "13c1fc2a")
 
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, moviesCatalog.getGenres())
+        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, moviesCatalog.genres)
         val genresListView: ListView = findViewById(R.id.genresListView)
         genresListView.adapter = adapter
         genresListView.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, i, l ->
             moviesCatalog.setGenreFilter(genresListView.getAdapter().getItem(i).toString())
 //            imageAdapter.notifyDataSetChanged()
         }
-
+        FileSystemImageLoaderTask(this, moviesCatalog).execute()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
@@ -78,18 +98,30 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
         return when (item.itemId) {
             R.id.action_scan -> {
-                MovieLoaderTask(this, NasService("smb://192.168.1.90/Volume_1/movies/")).execute()
+                val nasProgressBar = findViewById(R.id.nasProgressBar) as ProgressBar
+                nasProgressBar.visibility = ProgressBar.VISIBLE
+                NasScanningTask(this, moviesCatalog, nasProgressBar).execute()
                 true
             }
             R.id.action_info -> {
                 val builder = AlertDialog.Builder(this)
                 val ip = "192.168.1.0"
                 val message = "Ip Address Dune HD: $ip" +
-                "\nAPI version: 5" +
-                "\nMovies number: " + moviesCatalog.getCount()
+                        "\nAPI version: 5" +
+                        "\nMovies number: " + moviesCatalog.getCount()
                 builder.setMessage(message).setTitle(R.string.info_title)
                 val dialog = builder.create()
                 dialog.show()
+                true
+            }
+            R.id.action_delete -> {
+                moviesCatalog.deleteAll()
+                val toast = Toast.makeText(applicationContext, "All files deleted", Toast.LENGTH_SHORT)
+                toast.show()
+                true
+            }
+            R.id.action_ls -> {
+                Log.d(LOG_TAG, "Private directory content: \n${filesDir.list().map { "[$it]" }.joinToString("\n")}")
                 true
             }
             else -> super.onOptionsItemSelected(item)
