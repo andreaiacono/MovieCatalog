@@ -1,5 +1,6 @@
 package org.andreaiacono.moviecatalog.activity
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -9,23 +10,24 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
-import org.andreaiacono.moviecatalog.core.MoviesCatalog
-import org.andreaiacono.moviecatalog.model.Movie
-import org.andreaiacono.moviecatalog.ui.AsyncTaskType
-import org.andreaiacono.moviecatalog.util.ImageAdapter
-import org.andreaiacono.moviecatalog.ui.PostTaskListener
 import org.andreaiacono.moviecatalog.R
 import org.andreaiacono.moviecatalog.activity.task.FileSystemImageLoaderTask
 import org.andreaiacono.moviecatalog.activity.task.NasScanningTask
+import org.andreaiacono.moviecatalog.core.MoviesCatalog
+import org.andreaiacono.moviecatalog.model.Movie
 import org.andreaiacono.moviecatalog.model.NasMovie
+import org.andreaiacono.moviecatalog.ui.AsyncTaskType
+import org.andreaiacono.moviecatalog.ui.PostTaskListener
+import org.andreaiacono.moviecatalog.util.ImageAdapter
 import org.andreaiacono.moviecatalog.util.thumbNameNormalizer
+
 
 class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
     val LOG_TAG = this.javaClass.name
 
-    private lateinit var imageGrid: GridView
-    private lateinit var moviesCatalog: MoviesCatalog
+    private lateinit var gridView: GridView
+//    private lateinit var moviesCatalog: MoviesCatalog
 
     override fun onPostTask(result: Any, asyncTaskType: AsyncTaskType, exception: Exception?) {
 
@@ -40,10 +42,10 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         } else
             when (asyncTaskType) {
                 AsyncTaskType.NAS_IMAGE_LOAD -> {
-//                    this.imageGrid.adapter = ImageAdapter(this, result as List<Bitmap>)
+//                    this.gridView.adapter = ImageAdapter(this, result as List<Bitmap>)
                 }
                 AsyncTaskType.NAS_SCAN -> {
-                    moviesCatalog.movies = (result as List<NasMovie>)
+                    MoviesCatalog.movies = (result as List<NasMovie>)
                         .map {
                             Movie(
                                 it.title,
@@ -54,13 +56,13 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                             )
                         }
                         .toList()
-                    moviesCatalog.saveCatalog()
+                    MoviesCatalog.saveCatalog()
                 }
                 AsyncTaskType.FILE_SYSTEM_IMAGE_LOAD -> {
                     val bitmaps = result as List<Bitmap>
                     Log.d(LOG_TAG, "$bitmaps")
                     if (!bitmaps.isEmpty()) {
-                        imageGrid.adapter = ImageAdapter(this, bitmaps)
+                        gridView.adapter = ImageAdapter(this, bitmaps)
                     } else {
                         // dialog for asking to scan?
                     }
@@ -76,9 +78,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
-        imageGrid = findViewById(R.id.moviesGridView)
-        moviesCatalog =
-            MoviesCatalog(
+        MoviesCatalog.init(
                 this,
                 "smb://192.168.1.90/Volume_1/movies/",
                 "http://www.omdbapi.com/",
@@ -86,21 +86,40 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                 "192.168.1.83"
             )
 
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        val toolbar: Toolbar = findViewById(R.id.mainToolbar)
         setSupportActionBar(toolbar)
 
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, moviesCatalog.genres)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, MoviesCatalog.genres)
         val genresListView: ListView = findViewById(R.id.genresListView)
         genresListView.adapter = adapter
         genresListView.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, i, l ->
-            moviesCatalog.setGenreFilter(genresListView.getAdapter().getItem(i).toString())
+            MoviesCatalog.setGenreFilter(genresListView.getAdapter().getItem(i).toString())
 //            imageAdapter.notifyDataSetChanged()
         }
+
+        gridView = findViewById(R.id.moviesGridView)
+        gridView.onItemClickListener = AdapterView.OnItemClickListener { parent, v, position, id ->
+            val fullScreenIntent = Intent(v.context, MovieDetailActivity::class.java)
+            fullScreenIntent.putExtra(MovieDetailActivity::class.java.getName(), MoviesCatalog.movies[position].dirName)
+            startActivity(fullScreenIntent)
+        }
+
+//        gridView.setOnItemClickListener { parent, v, position, id ->
+//            val fullScreenIntent = Intent(v.context, MovieDetailActivity::class.java)
+//            fullScreenIntent.putExtra(activity.javaClass.name, MoviesCatalog.movies[position].dirName)
+//            startActivity(fullScreenIntent)
+//
+//            val activity = MovieDetailActivity()
+//            val fullScreenIntent = Intent(v.context, MovieDetailActivity.)
+//            fullScreenIntent.putExtra(activity.javaClass.name, MoviesCatalog.movies[position].dirName)
+////            fullScreenIntent.putExtra("moviesCatalog", moviesCatalog)
+//            startActivity(fullScreenIntent)
+//        }
         val nasProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
         nasProgressBar.visibility = ProgressBar.VISIBLE
         nasProgressBar.max = 100
         nasProgressBar.progress = 0
-        FileSystemImageLoaderTask(this, moviesCatalog, nasProgressBar).execute()
+        FileSystemImageLoaderTask(this, MoviesCatalog, nasProgressBar).execute()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -114,7 +133,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             R.id.action_scan -> {
                 val nasProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
                 nasProgressBar.visibility = ProgressBar.VISIBLE
-                NasScanningTask(this, moviesCatalog).execute()
+                NasScanningTask(this, MoviesCatalog).execute()
                 true
             }
             R.id.action_info -> {
@@ -122,14 +141,14 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                 val ip = "192.168.1.0"
                 val message = "Ip Address Dune HD: $ip" +
                         "\nAPI version: 5" +
-                        "\nMovies number: " + moviesCatalog.getCount()
+                        "\nMovies number: " + MoviesCatalog.getCount()
                 builder.setMessage(message).setTitle(R.string.info_title)
                 val dialog = builder.create()
                 dialog.show()
                 true
             }
             R.id.action_delete -> {
-                moviesCatalog.deleteAll()
+                MoviesCatalog.deleteAll()
                 val toast = Toast.makeText(applicationContext, "All files deleted", Toast.LENGTH_SHORT)
                 toast.show()
                 true

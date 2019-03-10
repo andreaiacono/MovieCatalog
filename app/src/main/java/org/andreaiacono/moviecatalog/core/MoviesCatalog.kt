@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import org.andreaiacono.moviecatalog.activity.MainActivity
 import org.andreaiacono.moviecatalog.model.Movie
 import org.andreaiacono.moviecatalog.model.Search
 import org.andreaiacono.moviecatalog.service.DuneHdService
@@ -14,27 +15,33 @@ import org.andreaiacono.moviecatalog.util.MOVIE_CATALOG_FILENAME
 import java.io.*
 import java.util.*
 
-class MoviesCatalog(val main: Activity, nasUrl: String, openMovieUrl: String, openMovieApiKey: String, duneIp: String) {
+object MoviesCatalog {
 
     val LOG_TAG = this.javaClass.name
-    val ALL_GENRES = "No Filter"
 
+    val ALL_GENRES = "No Filter"
     val THUMBS_DIR = "thumbs"
     private var genreFilter: String = ALL_GENRES
     var genericFilter: String = ALL_GENRES
+
     var genres: List<String> = listOf()
-
     var movies: List<Movie> = listOf()
-    private var comparator: Comparator<Movie> = MovieComparator.BY_DATE_DESC
 
-    val nasService: NasService = NasService(nasUrl)
-    val openMovieService: OpenMovieService = OpenMovieService(openMovieUrl, openMovieApiKey)
-    val duneHdService: DuneHdService = DuneHdService(duneIp, nasUrl)
+    private var comparator: Comparator<Movie> = MovieComparator.BY_DATE_DESC
+    lateinit var nasService: NasService
+    lateinit var openMovieService: OpenMovieService
+    lateinit var duneHdService: DuneHdService
+    lateinit var main: MainActivity
 
     var sortingGenre: String = ALL_GENRES
 
-    init {
+    fun init( main: MainActivity, nasUrl: String, openMovieUrl: String, openMovieApiKey: String, duneIp: String) {
+        this.main = main
         loadCatalog()
+        nasService = NasService(nasUrl)
+        openMovieService = OpenMovieService(openMovieUrl, openMovieApiKey)
+        duneHdService = DuneHdService(duneIp, nasUrl)
+
         genres = movies.flatMap { it.genres }.toList().distinct().sorted()
         Log.d(LOG_TAG, "Loaded movies: $movies")
         Log.d(LOG_TAG, "Loaded genres: $genres")

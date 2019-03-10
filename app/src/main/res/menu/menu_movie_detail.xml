@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_trailer"
+        android:layout_centerInParent="true"
+        android:icon="@drawable/ic_action_trailer"
+        android:title="@string/trailer"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_play"
+        android:layout_centerInParent="true"
+        android:icon="@android:drawable/ic_media_play"
+        android:title="@string/play"
+        app:showAsAction="ifRoom" />
+</menu>
