@@ -96,7 +96,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             moviesCatalog.setGenreFilter(genresListView.getAdapter().getItem(i).toString())
 //            imageAdapter.notifyDataSetChanged()
         }
-        val nasProgressBar: ProgressBar = findViewById(R.id.nasProgressBar)
+        val nasProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
         nasProgressBar.visibility = ProgressBar.VISIBLE
         nasProgressBar.max = 100
         nasProgressBar.progress = 0
@@ -112,11 +112,9 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
         return when (item.itemId) {
             R.id.action_scan -> {
-                val nasProgressBar: ProgressBar = findViewById(R.id.nasProgressBar)
+                val nasProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
                 nasProgressBar.visibility = ProgressBar.VISIBLE
-                nasProgressBar.max = 100
-                nasProgressBar.progress = 0
-                NasScanningTask(this, moviesCatalog, nasProgressBar).execute()
+                NasScanningTask(this, moviesCatalog).execute()
                 true
             }
             R.id.action_info -> {

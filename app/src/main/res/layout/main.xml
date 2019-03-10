@@ -12,12 +12,20 @@
 
 
     <ProgressBar
-        android:id="@+id/nasProgressBar"
+        android:id="@+id/horizontalProgressBar"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="250dp"
         android:layout_height="25dp"
-        android:layout_marginLeft="90dp"
+         android:layout_marginLeft="90dp"
         android:layout_marginTop="320dp" />
+
+    <ProgressBar
+        android:id="@+id/indefiniteProgressBar"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:foreground="?attr/colorPrimaryDark"
+        android:layout_marginLeft="90dp"
+        android:layout_marginTop="450dp" />
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
