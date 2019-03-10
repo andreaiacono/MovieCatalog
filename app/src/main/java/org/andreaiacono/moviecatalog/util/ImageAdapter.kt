@@ -27,16 +27,14 @@ class ImageAdapter(val context: Context, val bitmapList: List<Bitmap>) : BaseAda
             //Calculation of ImageView Size - density independent.
             //maybe you should do this calculation not exactly in this method but put is somewhere else.
             val r = Resources.getSystem()
-            val px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 140f, r.getDisplayMetrics())
-
+            val px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100f, r.getDisplayMetrics())
 
             imageView = ImageView(this.context)
             imageView.layoutParams = ViewGroup.LayoutParams(px.toInt(), px.toInt())
             imageView.scaleType = ImageView.ScaleType.CENTER_CROP
             imageView.setPadding(8, 8, 4, 16)
-
-            imageView.setBackgroundColor(Color.BLUE)
-        } else {
+        }
+        else {
             imageView = convertView as ImageView
         }
 

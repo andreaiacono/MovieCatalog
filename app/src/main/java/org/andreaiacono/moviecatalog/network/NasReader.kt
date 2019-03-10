@@ -22,7 +22,7 @@ class NasReader(val url: String) {
         val notFoundMovies: MutableList<String> = mutableListOf()
 
         val moviesRoot = SmbFile(url)
-        for (movieDir in moviesRoot.listFiles().take(3)) {
+        for (movieDir in moviesRoot.listFiles().take(1000)) {
 
             Log.d(LOG_TAG, "Reading file ${movieDir.name}")
             if (movieDir.isDirectory && !existingMoviesDirs.contains(movieDir.name)) {
@@ -61,7 +61,7 @@ class NasReader(val url: String) {
     }
 
     private fun getFullImage(dirName: String, filename: String): Bitmap {
-        val fullName = "$url$dirName/$filename"
+        val fullName = "$url$dirName$filename"
         Log.d(LOG_TAG, "Loading image $fullName")
         return urlImageToBitmap(SmbFile(fullName).inputStream)
     }

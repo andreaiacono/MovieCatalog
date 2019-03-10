@@ -35,7 +35,7 @@ class MoviesCatalog(val main: Activity, nasUrl: String, openMovieUrl: String, op
 
     init {
         loadCatalog()
-        genres = movies.flatMap { it.genres }.toList().distinct()
+        genres = movies.flatMap { it.genres }.toList().distinct().sorted()
         Log.d(LOG_TAG, "Loaded movies: $movies")
         Log.d(LOG_TAG, "Loaded genres: $genres")
     }

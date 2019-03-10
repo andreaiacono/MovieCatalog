@@ -96,7 +96,11 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             moviesCatalog.setGenreFilter(genresListView.getAdapter().getItem(i).toString())
 //            imageAdapter.notifyDataSetChanged()
         }
-        FileSystemImageLoaderTask(this, moviesCatalog).execute()
+        val nasProgressBar: ProgressBar = findViewById(R.id.nasProgressBar)
+        nasProgressBar.visibility = ProgressBar.VISIBLE
+        nasProgressBar.max = 100
+        nasProgressBar.progress = 0
+        FileSystemImageLoaderTask(this, moviesCatalog, nasProgressBar).execute()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -108,8 +112,10 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
         return when (item.itemId) {
             R.id.action_scan -> {
-                val nasProgressBar = findViewById(R.id.nasProgressBar) as ProgressBar
+                val nasProgressBar: ProgressBar = findViewById(R.id.nasProgressBar)
                 nasProgressBar.visibility = ProgressBar.VISIBLE
+                nasProgressBar.max = 100
+                nasProgressBar.progress = 0
                 NasScanningTask(this, moviesCatalog, nasProgressBar).execute()
                 true
             }

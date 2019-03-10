@@ -4,15 +4,13 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import android.util.Log
+import android.view.View
+import android.widget.ProgressBar
 import org.andreaiacono.moviecatalog.core.MoviesCatalog
 import org.andreaiacono.moviecatalog.ui.AsyncTaskType
-import java.net.URL
 import org.andreaiacono.moviecatalog.ui.PostTaskListener
-import java.util.logging.Logger
 
-
-internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, val moviesCatalog: MoviesCatalog) :
-    AsyncTask<String, Void, Void>() {
+internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, val moviesCatalog: MoviesCatalog, val progressBar: ProgressBar) : AsyncTask<String, Integer, Void>() {
 
     private val syncTaskType: AsyncTaskType = AsyncTaskType.FILE_SYSTEM_IMAGE_LOAD
 
@@ -22,13 +20,19 @@ internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, va
 
     private var postTaskListener: PostTaskListener<Any> = taskListener
 
+    override fun onPreExecute() {
+        super.onPreExecute()
+        progressBar.max = moviesCatalog.getCount()
+    }
+
     override fun doInBackground(vararg dirName: String): Void? {
         Log.d(LOG_TAG, "Started loading images form disk")
-        moviesCatalog.movies.forEach {
+        moviesCatalog.movies.forEachIndexed {index, movie ->
             try {
-                val filename = "${moviesCatalog.main.application.applicationContext.filesDir}/${it.thumbName}"
+                val filename = "${moviesCatalog.main.application.applicationContext.filesDir}/${movie.thumbName}"
                 Log.d(LOG_TAG, "Loading image $filename")
                 bitmaps.add(BitmapFactory.decodeFile(filename))
+                publishProgress(index as Integer)
             }
             catch (e: Exception) {
                 this.exception = e
@@ -39,8 +43,14 @@ internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, va
         return null
     }
 
+    override fun onProgressUpdate(vararg values: Integer?) {
+        super.onProgressUpdate(values[0])
+        progressBar.progress = values[0]!!.toInt()
+    }
+
     override fun onPostExecute(result: Void?) {
         super.onPostExecute(result)
         postTaskListener.onPostTask(bitmaps, syncTaskType, exception)
+        progressBar.visibility = View.GONE
     }
 }
