@@ -49,7 +49,7 @@ internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, va
 
     override fun onPostExecute(result: Void?) {
         super.onPostExecute(result)
-        postTaskListener.onPostTask(bitmaps, syncTaskType, exception)
+        postTaskListener.onPostTask(ArrayList<Bitmap>(bitmaps), syncTaskType, exception)
         progressBar.visibility = View.GONE
     }
 }

@@ -22,7 +22,7 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_ls"
+        android:id="@+id/action_debugInfo"
         android:orderInCategory="100"
         android:title="@string/list_files"
         app:showAsAction="never" />

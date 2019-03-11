@@ -29,6 +29,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
     private lateinit var gridView: GridView
     private lateinit var moviesCatalog: MoviesCatalog
+    private lateinit var thumbs: ArrayList<Bitmap>
 
     override fun onPostTask(result: Any, asyncTaskType: AsyncTaskType, exception: Exception?) {
 
@@ -57,10 +58,9 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                     moviesCatalog.saveCatalog()
                 }
                 AsyncTaskType.FILE_SYSTEM_IMAGE_LOAD -> {
-                    val bitmaps = result as List<Bitmap>
-                    Log.d(LOG_TAG, "$bitmaps")
-                    if (!bitmaps.isEmpty()) {
-                        gridView.adapter = ImageAdapter(this, bitmaps)
+                    thumbs = result as ArrayList<Bitmap>
+                    if (!thumbs.isEmpty()) {
+                        gridView.adapter = ImageAdapter(this, thumbs)
                     } else {
                         // dialog for asking to scan?
                     }
@@ -99,7 +99,19 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         }
 
         val nasProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
-        FileSystemImageLoaderTask(this, moviesCatalog, nasProgressBar).execute()
+
+        if (savedInstanceState?.get("thumbs") != null) {
+            thumbs = savedInstanceState.getParcelableArrayList("thumbs")
+            gridView.adapter = ImageAdapter(this, thumbs)
+        }
+        else {
+            FileSystemImageLoaderTask(this, moviesCatalog, nasProgressBar).execute()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelableArrayList("thumbs", thumbs)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -133,7 +145,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                 toast.show()
                 true
             }
-            R.id.action_ls -> {
+            R.id.action_debugInfo -> {
                 val sendIntent: Intent = Intent().apply {
                     action = Intent.ACTION_SEND
                     val files = "<PRE>Private directory content: \n${filesDir.list().map { "[$it]" }.joinToString("\n")}</PRE>"
