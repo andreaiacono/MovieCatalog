@@ -30,7 +30,7 @@ class ImageAdapter(val context: Context, val bitmapList: List<Bitmap>) : BaseAda
             val px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100f, r.getDisplayMetrics())
 
             imageView = ImageView(this.context)
-            imageView.layoutParams = ViewGroup.LayoutParams(px.toInt(), px.toInt())
+            imageView.layoutParams = ViewGroup.LayoutParams(px.toInt(), (px * 1.5).toInt())
             imageView.scaleType = ImageView.ScaleType.CENTER_CROP
             imageView.setPadding(8, 8, 4, 16)
         }
