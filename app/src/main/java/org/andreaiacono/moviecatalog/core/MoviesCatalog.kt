@@ -73,6 +73,7 @@ class MoviesCatalog(val context: Context, nasUrl: String, openMovieUrl: String, 
         } catch (ex: Exception) {
             Log.e(LOG_TAG, "No catalog file $catalogFileName on device.")
         }
+        movies = movies.sortedWith(MovieComparator.BY_DATE_DESC)
     }
 
     fun saveBitmap(thumbFilename: String, image: Bitmap) {
