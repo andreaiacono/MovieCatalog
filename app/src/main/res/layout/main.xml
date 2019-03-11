@@ -11,22 +11,6 @@
     tools:context=".activity.MainActivity">
 
 
-    <ProgressBar
-        android:id="@+id/horizontalProgressBar"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="250dp"
-        android:layout_height="25dp"
-         android:layout_marginLeft="90dp"
-        android:layout_marginTop="320dp" />
-
-    <ProgressBar
-        android:id="@+id/indefiniteProgressBar"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:foreground="?attr/colorPrimaryDark"
-        android:layout_marginLeft="90dp"
-        android:layout_marginTop="450dp" />
-
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -39,6 +23,16 @@
             app:layout_scrollFlags="scroll|enterAlways" />
     </android.support.design.widget.AppBarLayout>
 
+    <GridView
+        android:id="@+id/moviesGridView"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignBottom="@+id/genresListView"
+        android:layout_alignParentTop="false"
+        android:layout_marginStart="150dp"
+        android:columnWidth="220dp"
+        android:numColumns="auto_fit" />
+
     <ListView
         android:id="@+id/genresListView"
         android:layout_width="150dp"
@@ -48,14 +42,19 @@
         android:layout_alignParentBottom="true"
         android:layout_weight="1" />
 
-    <GridView
-        android:id="@+id/moviesGridView"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_alignBottom="@+id/genresListView"
-        android:layout_alignParentTop="false"
-        android:layout_marginLeft="151dp"
-        android:columnWidth="220dp"
-        android:numColumns="auto_fit" />
+    <ProgressBar
+        android:id="@+id/indefiniteProgressBar"
+        style="@android:style/Widget.Holo.Light.ProgressBar.Small.Inverse"
+        android:layout_width="@android:dimen/app_icon_size"
+        android:layout_height="@android:dimen/app_icon_size"
+        android:layout_gravity="center|center_horizontal|center_vertical"
+        android:theme="@android:style/Widget.ProgressBar.Small" />
+
+    <ProgressBar
+        android:id="@+id/horizontalProgressBar"
+        style="@android:style/Widget.Holo.ProgressBar.Horizontal"
+        android:layout_width="@android:dimen/thumbnail_width"
+        android:layout_height="@dimen/item_margin"
+        android:layout_gravity="center|center_horizontal|center_vertical" />
 
 </android.support.design.widget.CoordinatorLayout>
