@@ -14,6 +14,11 @@ import android.view.ViewGroup
 
 class ImageAdapter(val context: Context, val bitmapList: List<Bitmap>) : BaseAdapter() {
 
+    val r = Resources.getSystem()
+    val pxWidth = (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 80f, r.getDisplayMetrics())).toInt()
+    val pxHeight = (pxWidth * 1.5).toInt()
+
+
     override fun getCount(): Int = bitmapList.size
 
     override fun getItem(position: Int): Any? = bitmapList[position]
@@ -26,11 +31,9 @@ class ImageAdapter(val context: Context, val bitmapList: List<Bitmap>) : BaseAda
 
             //Calculation of ImageView Size - density independent.
             //maybe you should do this calculation not exactly in this method but put is somewhere else.
-            val r = Resources.getSystem()
-            val px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100f, r.getDisplayMetrics())
 
             imageView = ImageView(this.context)
-            imageView.layoutParams = ViewGroup.LayoutParams(px.toInt(), (px * 1.5).toInt())
+            imageView.layoutParams = ViewGroup.LayoutParams(pxWidth, pxHeight)
             imageView.scaleType = ImageView.ScaleType.CENTER_CROP
             imageView.setPadding(8, 8, 4, 16)
         }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -10,8 +10,8 @@
     android:fitsSystemWindows="true"
     tools:context=".activity.MainActivity">
 
-
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -23,38 +23,48 @@
             app:layout_scrollFlags="scroll|enterAlways" />
     </android.support.design.widget.AppBarLayout>
 
-    <GridView
-        android:id="@+id/moviesGridView"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_alignBottom="@+id/genresListView"
-        android:layout_alignParentTop="false"
-        android:layout_marginStart="150dp"
-        android:columnWidth="220dp"
-        android:numColumns="auto_fit" />
+    <RelativeLayout
+        android:id="@+id/search_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/appbar">
 
-    <ListView
-        android:id="@+id/genresListView"
-        android:layout_width="150dp"
-        android:layout_height="fill_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentBottom="true"
-        android:layout_weight="1" />
+        <ListView
+            android:id="@+id/genresListView"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true" />
 
-    <ProgressBar
-        android:id="@+id/indefiniteProgressBar"
-        style="@android:style/Widget.Holo.Light.ProgressBar.Small.Inverse"
-        android:layout_width="@android:dimen/app_icon_size"
-        android:layout_height="@android:dimen/app_icon_size"
-        android:layout_gravity="center|center_horizontal|center_vertical"
-        android:theme="@android:style/Widget.ProgressBar.Small" />
+        <GridView
+            android:id="@+id/moviesGridView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@+id/genresListView"
+            android:numColumns="@integer/column_count" />
 
-    <ProgressBar
-        android:id="@+id/horizontalProgressBar"
-        style="@android:style/Widget.Holo.ProgressBar.Horizontal"
-        android:layout_width="@android:dimen/thumbnail_width"
-        android:layout_height="@dimen/item_margin"
-        android:layout_gravity="center|center_horizontal|center_vertical" />
+    </RelativeLayout>
 
-</android.support.design.widget.CoordinatorLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:id="@+id/indefiniteProgressBar"
+            style="@android:style/Widget.Holo.Light.ProgressBar.Small.Inverse"
+            android:layout_width="@android:dimen/app_icon_size"
+            android:layout_height="@android:dimen/app_icon_size"
+            android:layout_gravity="center|center_horizontal|center_vertical"
+            android:theme="@android:style/Widget.ProgressBar.Small"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/horizontalProgressBar"
+            style="@android:style/Widget.Holo.ProgressBar.Horizontal"
+            android:layout_width="@android:dimen/thumbnail_width"
+            android:layout_height="@dimen/item_margin"
+            android:layout_gravity="center|center_horizontal|center_vertical"
+            android:visibility="gone" />
+    </FrameLayout>
+
+</RelativeLayout>

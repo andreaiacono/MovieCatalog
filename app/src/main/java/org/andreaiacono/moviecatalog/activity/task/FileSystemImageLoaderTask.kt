@@ -17,7 +17,6 @@ internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, va
     val LOG_TAG = this.javaClass.name
     private var exception: Exception? = null
     private var bitmaps: MutableList<Bitmap> = mutableListOf(Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8))
-
     private var postTaskListener: PostTaskListener<Any> = taskListener
 
     override fun onPreExecute() {
