@@ -23,13 +23,14 @@ internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, va
     override fun onPreExecute() {
         super.onPreExecute()
         progressBar.max = moviesCatalog.getCount()
+        progressBar.bringToFront()
+        progressBar.visibility = View.VISIBLE
     }
 
     override fun doInBackground(vararg dirName: String): Void? {
-        Log.d(LOG_TAG, "Started loading images form disk")
         moviesCatalog.movies.forEachIndexed {index, movie ->
             try {
-                val filename = "${moviesCatalog.main.application.applicationContext.filesDir}/${movie.thumbName}"
+                val filename = "${moviesCatalog.context.filesDir}/${movie.thumbName}"
                 Log.d(LOG_TAG, "Loading image $filename")
                 bitmaps.add(BitmapFactory.decodeFile(filename))
                 publishProgress(index as Integer)
@@ -39,7 +40,6 @@ internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, va
                 Log.e(LOG_TAG, "Error while loading image $dirName: ${e.message}")
             }
         }
-        Log.d(LOG_TAG, "Finished loading images form disk")
         return null
     }
 

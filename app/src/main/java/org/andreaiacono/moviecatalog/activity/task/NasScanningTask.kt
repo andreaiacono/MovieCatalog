@@ -1,19 +1,17 @@
 package org.andreaiacono.moviecatalog.activity.task
 
 import android.os.AsyncTask
-import android.service.voice.VoiceInteractionService
 import android.util.Log
 import android.util.Log.e
 import android.view.View
 import android.widget.ProgressBar
-import org.andreaiacono.moviecatalog.R
 import org.andreaiacono.moviecatalog.core.MoviesCatalog
 import org.andreaiacono.moviecatalog.ui.AsyncTaskType
 import org.andreaiacono.moviecatalog.ui.PostTaskListener
 import org.andreaiacono.moviecatalog.model.NasMovie
 import org.andreaiacono.moviecatalog.util.thumbNameNormalizer
 
-internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCatalog: MoviesCatalog) :
+internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCatalog: MoviesCatalog, val horizontalProgressBar: ProgressBar, val indefiniteProgressBar: ProgressBar) :
     AsyncTask<String, Integer, Void>() {
 
     val asyncTaskType = AsyncTaskType.NAS_SCAN
@@ -24,8 +22,6 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
     private var postTaskListener: PostTaskListener<Any> = taskListener
     lateinit var result: Pair<List<NasMovie>, List<String>>
     var isReady: Boolean = false
-    val horizontalProgressBar: ProgressBar = moviesCatalog.main.findViewById(R.id.horizontalProgressBar)
-    val indefiniteProgressBar: ProgressBar = moviesCatalog.main.findViewById(R.id.indefiniteProgressBar)
 
     override fun onPreExecute() {
         super.onPreExecute()
@@ -49,7 +45,7 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
     }
 
     override fun doInBackground(vararg url: String): Void? {
-        Log.d(LOG_TAG, "Loading data from NAS")
+        Log.d(LOG_TAG, "Loading XML data from NAS")
         try {
             if (!result.second.isEmpty()) {
                 e(this.LOG_TAG, ("Not processed movies: ${result.second}"))
@@ -61,7 +57,7 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
                 publishProgress(index as Integer)
                 try {
                     val thumbFilename = thumbNameNormalizer(movie.title)
-                    Log.d(LOG_TAG, "saving $thumbFilename (dirnmae=${movie.dirName})")
+                    Log.d(LOG_TAG, "Saving $thumbFilename (dirnmae=${movie.dirName})")
                     moviesCatalog.saveBitmap(thumbFilename, moviesCatalog.nasService.getThumbnail(movie.dirName))
                 } catch (ex: Exception) {
                     Log.e(LOG_TAG, ex.message, ex)

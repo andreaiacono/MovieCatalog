@@ -11,11 +11,11 @@ import android.widget.ImageView
 import android.widget.Toast
 import org.andreaiacono.moviecatalog.R
 import org.andreaiacono.moviecatalog.activity.task.NasImageLoaderTask
-import org.andreaiacono.moviecatalog.core.MoviesCatalog
+import org.andreaiacono.moviecatalog.service.NasService
 import org.andreaiacono.moviecatalog.ui.AsyncTaskType
 import org.andreaiacono.moviecatalog.ui.PostTaskListener
 
-class MovieDetailActivity() : PostTaskListener<Any>, AppCompatActivity() {
+class MovieDetailActivity : PostTaskListener<Any>, AppCompatActivity() {
 
     val LOG_TAG = this.javaClass.name
 
@@ -47,8 +47,9 @@ class MovieDetailActivity() : PostTaskListener<Any>, AppCompatActivity() {
 
         imageView = findViewById(R.id.movie_fullscreen_view)
 
-        val movieDir = intent.extras.get(MovieDetailActivity::class.java.name) as String
-        NasImageLoaderTask(this, MoviesCatalog, movieDir).execute()
+        val movieDir = intent.extras.get("position") as String
+        val nasService =  intent.extras.get("NasService") as NasService
+        NasImageLoaderTask(this, nasService, movieDir).execute()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

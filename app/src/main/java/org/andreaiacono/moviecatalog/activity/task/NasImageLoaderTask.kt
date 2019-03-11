@@ -3,11 +3,11 @@ package org.andreaiacono.moviecatalog.activity.task
 import android.graphics.Bitmap
 import android.os.AsyncTask
 import android.util.Log
-import org.andreaiacono.moviecatalog.core.MoviesCatalog
+import org.andreaiacono.moviecatalog.service.NasService
 import org.andreaiacono.moviecatalog.ui.AsyncTaskType
 import org.andreaiacono.moviecatalog.ui.PostTaskListener
 
-internal class NasImageLoaderTask(taskListener: PostTaskListener<Any>, val moviesCatalog: MoviesCatalog, val movieDir: String) :
+internal class NasImageLoaderTask(taskListener: PostTaskListener<Any>, val nasService: NasService, val movieDir: String) :
     AsyncTask<String, Integer, Void>() {
 
     val asyncTaskType = AsyncTaskType.NAS_IMAGE_LOAD
@@ -20,7 +20,7 @@ internal class NasImageLoaderTask(taskListener: PostTaskListener<Any>, val movie
     override fun doInBackground(vararg url: String): Void? {
         Log.d(LOG_TAG, "Loading image from NAS: $movieDir")
         try {
-            bitmap = MoviesCatalog.nasService.getFullImage(movieDir)
+            bitmap = nasService.getFullImage(movieDir)
         }
         catch (e: Exception) {
             this.exception = e

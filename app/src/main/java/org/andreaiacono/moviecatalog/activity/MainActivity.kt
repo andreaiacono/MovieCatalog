@@ -20,6 +20,7 @@ import org.andreaiacono.moviecatalog.ui.AsyncTaskType
 import org.andreaiacono.moviecatalog.ui.PostTaskListener
 import org.andreaiacono.moviecatalog.util.ImageAdapter
 import org.andreaiacono.moviecatalog.util.thumbNameNormalizer
+import java.io.Serializable
 
 
 class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
@@ -27,7 +28,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
     val LOG_TAG = this.javaClass.name
 
     private lateinit var gridView: GridView
-//    private lateinit var moviesCatalog: MoviesCatalog
+    private lateinit var moviesCatalog: MoviesCatalog
 
     override fun onPostTask(result: Any, asyncTaskType: AsyncTaskType, exception: Exception?) {
 
@@ -41,11 +42,8 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             toast.show()
         } else
             when (asyncTaskType) {
-                AsyncTaskType.NAS_IMAGE_LOAD -> {
-//                    this.gridView.adapter = ImageAdapter(this, result as List<Bitmap>)
-                }
                 AsyncTaskType.NAS_SCAN -> {
-                    MoviesCatalog.movies = (result as List<NasMovie>)
+                    moviesCatalog.movies = (result as List<NasMovie>)
                         .map {
                             Movie(
                                 it.title,
@@ -56,7 +54,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                             )
                         }
                         .toList()
-                    MoviesCatalog.saveCatalog()
+                    moviesCatalog.saveCatalog()
                 }
                 AsyncTaskType.FILE_SYSTEM_IMAGE_LOAD -> {
                     val bitmaps = result as List<Bitmap>
@@ -78,48 +76,30 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
-        MoviesCatalog.init(
-                this,
-                "smb://192.168.1.90/Volume_1/movies/",
-                "http://www.omdbapi.com/",
-                "13c1fc2a",
-                "192.168.1.83"
-            )
 
+        moviesCatalog = MoviesCatalog(this, "smb://192.168.1.90/Volume_1/movies/", "http://www.omdbapi.com/", "13c1fc2a", "192.168.1.83")
         val toolbar: Toolbar = findViewById(R.id.mainToolbar)
         setSupportActionBar(toolbar)
 
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, MoviesCatalog.genres)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, moviesCatalog.genres)
         val genresListView: ListView = findViewById(R.id.genresListView)
         genresListView.adapter = adapter
         genresListView.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, i, l ->
-            MoviesCatalog.setGenreFilter(genresListView.getAdapter().getItem(i).toString())
+            moviesCatalog.setGenreFilter(genresListView.getAdapter().getItem(i).toString())
 //            imageAdapter.notifyDataSetChanged()
         }
 
         gridView = findViewById(R.id.moviesGridView)
         gridView.onItemClickListener = AdapterView.OnItemClickListener { parent, v, position, id ->
             val fullScreenIntent = Intent(v.context, MovieDetailActivity::class.java)
-            fullScreenIntent.putExtra(MovieDetailActivity::class.java.getName(), MoviesCatalog.movies[position].dirName)
+            fullScreenIntent.putExtra("position", moviesCatalog.movies[position - 1].dirName)
+            fullScreenIntent.putExtra("NasService", moviesCatalog.nasService as Serializable)
+
             startActivity(fullScreenIntent)
         }
 
-//        gridView.setOnItemClickListener { parent, v, position, id ->
-//            val fullScreenIntent = Intent(v.context, MovieDetailActivity::class.java)
-//            fullScreenIntent.putExtra(activity.javaClass.name, MoviesCatalog.movies[position].dirName)
-//            startActivity(fullScreenIntent)
-//
-//            val activity = MovieDetailActivity()
-//            val fullScreenIntent = Intent(v.context, MovieDetailActivity.)
-//            fullScreenIntent.putExtra(activity.javaClass.name, MoviesCatalog.movies[position].dirName)
-////            fullScreenIntent.putExtra("moviesCatalog", moviesCatalog)
-//            startActivity(fullScreenIntent)
-//        }
         val nasProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
-        nasProgressBar.visibility = ProgressBar.VISIBLE
-        nasProgressBar.max = 100
-        nasProgressBar.progress = 0
-        FileSystemImageLoaderTask(this, MoviesCatalog, nasProgressBar).execute()
+        FileSystemImageLoaderTask(this, moviesCatalog, nasProgressBar).execute()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -131,9 +111,9 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
         return when (item.itemId) {
             R.id.action_scan -> {
-                val nasProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
-                nasProgressBar.visibility = ProgressBar.VISIBLE
-                NasScanningTask(this, MoviesCatalog).execute()
+                val horizontalProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
+                val indefiniteProgressBar: ProgressBar = findViewById(R.id.indefiniteProgressBar)
+                NasScanningTask(this, moviesCatalog, horizontalProgressBar, indefiniteProgressBar).execute()
                 true
             }
             R.id.action_info -> {
@@ -141,14 +121,14 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                 val ip = "192.168.1.0"
                 val message = "Ip Address Dune HD: $ip" +
                         "\nAPI version: 5" +
-                        "\nMovies number: " + MoviesCatalog.getCount()
+                        "\nMovies number: " + moviesCatalog.getCount()
                 builder.setMessage(message).setTitle(R.string.info_title)
                 val dialog = builder.create()
                 dialog.show()
                 true
             }
             R.id.action_delete -> {
-                MoviesCatalog.deleteAll()
+                moviesCatalog.deleteAll()
                 val toast = Toast.makeText(applicationContext, "All files deleted", Toast.LENGTH_SHORT)
                 toast.show()
                 true

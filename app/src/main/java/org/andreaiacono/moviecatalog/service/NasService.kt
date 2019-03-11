@@ -3,13 +3,14 @@ package org.andreaiacono.moviecatalog.service
 import org.andreaiacono.moviecatalog.model.Movie
 import org.andreaiacono.moviecatalog.model.NasMovie
 import org.andreaiacono.moviecatalog.network.NasReader
+import java.io.Serializable
 
 
-class NasService(url: String) {
+class NasService(url: String) : Serializable {
 
     private val nasReader = NasReader(url)
 
-    fun getTitles(existingMovies: List<Movie>): Pair<List<NasMovie>,List<String>> = nasReader.getMovies(existingMovies)
+    fun getTitles(existingMovies: List<Movie>): Pair<List<NasMovie>, List<String>> = nasReader.getMovies(existingMovies)
 
     fun getThumbnail(movieDir: String) = nasReader.getThumb(movieDir)
 

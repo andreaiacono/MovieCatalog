@@ -8,10 +8,10 @@ import org.andreaiacono.moviecatalog.model.Movie
 import org.andreaiacono.moviecatalog.model.NasMovie
 import org.andreaiacono.moviecatalog.model.fromXml
 import java.io.InputStream
+import java.io.Serializable
 import java.util.*
 
-
-class NasReader(val url: String) {
+class NasReader(val url: String) : Serializable {
 
     val LOG_TAG = this.javaClass.name
 

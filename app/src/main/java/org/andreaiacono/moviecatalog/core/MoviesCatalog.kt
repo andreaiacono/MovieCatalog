@@ -1,11 +1,8 @@
 package org.andreaiacono.moviecatalog.core
 
-import android.app.Activity
-
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import org.andreaiacono.moviecatalog.activity.MainActivity
 import org.andreaiacono.moviecatalog.model.Movie
 import org.andreaiacono.moviecatalog.model.Search
 import org.andreaiacono.moviecatalog.service.DuneHdService
@@ -15,12 +12,11 @@ import org.andreaiacono.moviecatalog.util.MOVIE_CATALOG_FILENAME
 import java.io.*
 import java.util.*
 
-object MoviesCatalog {
+class MoviesCatalog(val context: Context, nasUrl: String, openMovieUrl: String, openMovieApiKey: String, duneIp: String) {
 
     val LOG_TAG = this.javaClass.name
 
     val ALL_GENRES = "No Filter"
-    val THUMBS_DIR = "thumbs"
     private var genreFilter: String = ALL_GENRES
     var genericFilter: String = ALL_GENRES
 
@@ -28,20 +24,14 @@ object MoviesCatalog {
     var movies: List<Movie> = listOf()
 
     private var comparator: Comparator<Movie> = MovieComparator.BY_DATE_DESC
-    lateinit var nasService: NasService
-    lateinit var openMovieService: OpenMovieService
-    lateinit var duneHdService: DuneHdService
-    lateinit var main: MainActivity
+    val nasService = NasService(nasUrl)
+    val openMovieService = OpenMovieService(openMovieUrl, openMovieApiKey)
+    val duneHdService = DuneHdService(duneIp, nasUrl)
 
     var sortingGenre: String = ALL_GENRES
 
-    fun init( main: MainActivity, nasUrl: String, openMovieUrl: String, openMovieApiKey: String, duneIp: String) {
-        this.main = main
+    init {
         loadCatalog()
-        nasService = NasService(nasUrl)
-        openMovieService = OpenMovieService(openMovieUrl, openMovieApiKey)
-        duneHdService = DuneHdService(duneIp, nasUrl)
-
         genres = movies.flatMap { it.genres }.toList().distinct().sorted()
         Log.d(LOG_TAG, "Loaded movies: $movies")
         Log.d(LOG_TAG, "Loaded genres: $genres")
@@ -58,7 +48,7 @@ object MoviesCatalog {
     }
 
     fun saveCatalog() {
-        val catalogFileName = "${main.application.applicationContext.filesDir}/$MOVIE_CATALOG_FILENAME"
+        val catalogFileName = "${context.filesDir}/$MOVIE_CATALOG_FILENAME"
         try {
             Log.d(LOG_TAG, "Saving $movies to $catalogFileName")
             ObjectOutputStream(FileOutputStream(catalogFileName)).use { it.writeObject(movies) }
@@ -69,7 +59,7 @@ object MoviesCatalog {
     }
 
     fun loadCatalog() {
-        val catalogFileName = "${main.application.applicationContext.filesDir}/$MOVIE_CATALOG_FILENAME"
+        val catalogFileName = "${context.filesDir}/$MOVIE_CATALOG_FILENAME"
         try {
             ObjectInputStream(FileInputStream(catalogFileName)).use {
                 val catalog = it.readObject()
@@ -87,7 +77,7 @@ object MoviesCatalog {
 
     fun saveBitmap(thumbFilename: String, image: Bitmap) {
         try {
-            main.application.applicationContext.openFileOutput(thumbFilename, Context.MODE_PRIVATE).use {
+            context.openFileOutput(thumbFilename, Context.MODE_PRIVATE).use {
                 image.compress(Bitmap.CompressFormat.PNG, 92, it)
             }
         } catch (ex: Exception) {
@@ -96,8 +86,7 @@ object MoviesCatalog {
     }
 
     fun deleteAll() {
-        val ctx = main.application.applicationContext
-        ctx.getFilesDir().listFiles().forEach { it.delete() }
+        context.getFilesDir().listFiles().forEach { it.delete() }
     }
 }
 
