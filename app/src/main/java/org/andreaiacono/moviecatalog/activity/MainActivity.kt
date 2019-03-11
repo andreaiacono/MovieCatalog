@@ -134,7 +134,14 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                 true
             }
             R.id.action_ls -> {
-                Log.d(LOG_TAG, "Private directory content: \n${filesDir.list().map { "[$it]" }.joinToString("\n")}")
+                val sendIntent: Intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    val files = "<PRE>Private directory content: \n${filesDir.list().map { "[$it]" }.joinToString("\n")}</PRE>"
+                    putExtra(Intent.EXTRA_TEXT, files)
+                    type = "text/plain"
+                    Log.d(LOG_TAG, files)
+                }
+                startActivity(sendIntent)
                 true
             }
             else -> super.onOptionsItemSelected(item)
