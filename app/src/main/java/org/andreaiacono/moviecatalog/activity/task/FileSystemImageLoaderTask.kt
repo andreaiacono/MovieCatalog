@@ -7,8 +7,10 @@ import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import org.andreaiacono.moviecatalog.core.MoviesCatalog
+import org.andreaiacono.moviecatalog.model.EMPTY_MOVIE
 import org.andreaiacono.moviecatalog.ui.AsyncTaskType
 import org.andreaiacono.moviecatalog.ui.PostTaskListener
+import org.andreaiacono.moviecatalog.util.MovieBitmap
 
 internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, val moviesCatalog: MoviesCatalog, val progressBar: ProgressBar) : AsyncTask<String, Integer, Void>() {
 
@@ -16,7 +18,7 @@ internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, va
 
     val LOG_TAG = this.javaClass.name
     private var exception: Exception? = null
-    private var bitmaps: MutableList<Bitmap> = mutableListOf(Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8))
+    private var movieBitmaps: MutableList<MovieBitmap> = mutableListOf(MovieBitmap(EMPTY_MOVIE, Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8)))
     private var postTaskListener: PostTaskListener<Any> = taskListener
 
     override fun onPreExecute() {
@@ -31,7 +33,7 @@ internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, va
             try {
                 val filename = "${moviesCatalog.context.filesDir}/${movie.thumbName}"
                 Log.d(LOG_TAG, "Loading image $filename")
-                bitmaps.add(BitmapFactory.decodeFile(filename))
+                movieBitmaps.add(MovieBitmap(movie, BitmapFactory.decodeFile(filename)))
                 publishProgress(index as Integer)
             }
             catch (e: Exception) {
@@ -49,7 +51,7 @@ internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, va
 
     override fun onPostExecute(result: Void?) {
         super.onPostExecute(result)
-        postTaskListener.onPostTask(ArrayList<Bitmap>(bitmaps), syncTaskType, exception)
+        postTaskListener.onPostTask(ArrayList<MovieBitmap>(movieBitmaps), syncTaskType, exception)
         progressBar.visibility = View.GONE
     }
 }

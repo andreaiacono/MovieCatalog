@@ -10,3 +10,5 @@ data class Movie (
     val genres: List<String> = listOf(),
     val thumbName: String
 ) : Serializable
+
+val EMPTY_MOVIE = Movie("", Date(0L), "", thumbName = "")

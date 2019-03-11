@@ -12,15 +12,15 @@ import org.andreaiacono.moviecatalog.util.MOVIE_CATALOG_FILENAME
 import java.io.*
 import java.util.*
 
+val ALL_GENRES = "No Filter"
+
 class MoviesCatalog(val context: Context, nasUrl: String, openMovieUrl: String, openMovieApiKey: String, duneIp: String) {
 
     val LOG_TAG = this.javaClass.name
-
-    val ALL_GENRES = "No Filter"
     private var genreFilter: String = ALL_GENRES
     var genericFilter: String = ALL_GENRES
 
-    var genres: List<String> = listOf()
+    var genres: MutableList<String> = mutableListOf()
     var movies: List<Movie> = listOf()
 
     private var comparator: Comparator<Movie> = MovieComparator.BY_DATE_DESC
@@ -32,7 +32,8 @@ class MoviesCatalog(val context: Context, nasUrl: String, openMovieUrl: String, 
 
     init {
         loadCatalog()
-        genres = movies.flatMap { it.genres }.toList().distinct().sorted()
+        genres = mutableListOf(ALL_GENRES)
+        genres.addAll(movies.flatMap { it.genres }.toList().distinct().sorted())
         Log.d(LOG_TAG, "Loaded movies: $movies")
         Log.d(LOG_TAG, "Loaded genres: $genres")
     }
@@ -74,6 +75,7 @@ class MoviesCatalog(val context: Context, nasUrl: String, openMovieUrl: String, 
             Log.e(LOG_TAG, "No catalog file $catalogFileName on device.")
         }
         movies = movies.sortedWith(MovieComparator.BY_DATE_DESC)
+        Log.d(LOG_TAG, "Movie: ${movies[0]}")
     }
 
     fun saveBitmap(thumbFilename: String, image: Bitmap) {

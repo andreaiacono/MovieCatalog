@@ -1,7 +1,6 @@
 package org.andreaiacono.moviecatalog.activity
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -19,6 +18,7 @@ import org.andreaiacono.moviecatalog.model.NasMovie
 import org.andreaiacono.moviecatalog.ui.AsyncTaskType
 import org.andreaiacono.moviecatalog.ui.PostTaskListener
 import org.andreaiacono.moviecatalog.util.ImageAdapter
+import org.andreaiacono.moviecatalog.util.MovieBitmap
 import org.andreaiacono.moviecatalog.util.thumbNameNormalizer
 import java.io.Serializable
 
@@ -29,7 +29,8 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
     private lateinit var gridView: GridView
     private lateinit var moviesCatalog: MoviesCatalog
-    private lateinit var thumbs: ArrayList<Bitmap>
+    private lateinit var movieBitmaps: ArrayList<MovieBitmap>
+    private lateinit var imageAdapter: ImageAdapter
 
     override fun onPostTask(result: Any, asyncTaskType: AsyncTaskType, exception: Exception?) {
 
@@ -58,9 +59,10 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                     moviesCatalog.saveCatalog()
                 }
                 AsyncTaskType.FILE_SYSTEM_IMAGE_LOAD -> {
-                    thumbs = result as ArrayList<Bitmap>
-                    if (!thumbs.isEmpty()) {
-                        gridView.adapter = ImageAdapter(this, thumbs)
+                    movieBitmaps = result as ArrayList<MovieBitmap>
+                    if (!movieBitmaps.isEmpty()) {
+                        imageAdapter = ImageAdapter(this, movieBitmaps)
+                        gridView.adapter = imageAdapter
                     } else {
                         // dialog for asking to scan?
                     }
@@ -77,7 +79,13 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
 
-        moviesCatalog = MoviesCatalog(this, "smb://192.168.1.90/Volume_1/movies/", "http://www.omdbapi.com/", "13c1fc2a", "192.168.1.83")
+        moviesCatalog = MoviesCatalog(
+            this,
+            "smb://192.168.1.90/Volume_1/movies/",
+            "http://www.omdbapi.com/",
+            "13c1fc2a",
+            "192.168.1.83"
+        )
         val toolbar: Toolbar = findViewById(R.id.mainToolbar)
         setSupportActionBar(toolbar)
 
@@ -85,14 +93,14 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         val genresListView: ListView = findViewById(R.id.genresListView)
         genresListView.adapter = adapter
         genresListView.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, i, l ->
-            moviesCatalog.setGenreFilter(genresListView.getAdapter().getItem(i).toString())
-//            imageAdapter.notifyDataSetChanged()
+            imageAdapter.filterByGenre(genresListView.getAdapter().getItem(i).toString())
+            imageAdapter.notifyDataSetChanged()
         }
 
         gridView = findViewById(R.id.moviesGridView)
         gridView.onItemClickListener = AdapterView.OnItemClickListener { parent, v, position, id ->
             val fullScreenIntent = Intent(v.context, MovieDetailActivity::class.java)
-            fullScreenIntent.putExtra("position", moviesCatalog.movies[position - 1].dirName)
+            fullScreenIntent.putExtra("position", moviesCatalog.movies[position].dirName)
             fullScreenIntent.putExtra("NasService", moviesCatalog.nasService as Serializable)
 
             startActivity(fullScreenIntent)
@@ -100,18 +108,18 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
         val nasProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
 
-        if (savedInstanceState?.get("thumbs") != null) {
-            thumbs = savedInstanceState.getParcelableArrayList("thumbs")
-            gridView.adapter = ImageAdapter(this, thumbs)
-        }
-        else {
+        if (savedInstanceState?.get("movieBitmaps") != null) {
+            movieBitmaps = savedInstanceState.getParcelableArrayList("movieBitmaps")
+            imageAdapter = ImageAdapter(this, movieBitmaps)
+            gridView.adapter = imageAdapter
+        } else {
             FileSystemImageLoaderTask(this, moviesCatalog, nasProgressBar).execute()
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelableArrayList("thumbs", thumbs)
+        outState.putParcelableArrayList("movieBitmaps", movieBitmaps)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -148,7 +156,8 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             R.id.action_debugInfo -> {
                 val sendIntent: Intent = Intent().apply {
                     action = Intent.ACTION_SEND
-                    val files = "<PRE>Private directory content: \n${filesDir.list().map { "[$it]" }.joinToString("\n")}</PRE>"
+                    val files =
+                        "<PRE>Private directory content: \n${filesDir.list().map { "[$it]" }.joinToString("\n")}</PRE>"
                     putExtra(Intent.EXTRA_TEXT, files)
                     type = "text/plain"
                     Log.d(LOG_TAG, files)
