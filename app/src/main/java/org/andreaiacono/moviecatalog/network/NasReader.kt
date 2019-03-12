@@ -23,7 +23,7 @@ class NasReader(val url: String) : Serializable {
         val notFoundMovies: MutableList<String> = mutableListOf()
 
         val moviesRoot = SmbFile(url)
-        for (movieDir in moviesRoot.listFiles().take(1000)) {
+        for (movieDir in moviesRoot.listFiles().take(10)) {
 
             Log.d(LOG_TAG, "Reading file ${movieDir.name}")
             if (movieDir.isDirectory && !existingMoviesDirs.contains(movieDir.name)) {

@@ -4,36 +4,32 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import org.andreaiacono.moviecatalog.model.Movie
-import org.andreaiacono.moviecatalog.model.Search
 import org.andreaiacono.moviecatalog.service.DuneHdService
 import org.andreaiacono.moviecatalog.service.NasService
-import org.andreaiacono.moviecatalog.service.OpenMovieService
 import org.andreaiacono.moviecatalog.util.MOVIE_CATALOG_FILENAME
 import java.io.*
 import java.util.*
 
+
 val ALL_GENRES = "No Filter"
 
-class MoviesCatalog(val context: Context, nasUrl: String, openMovieUrl: String, openMovieApiKey: String, duneIp: String) {
-
+class MoviesCatalog(
+    val context: Context,
+    nasUrl: String,
+    duneIp: String
+) {
     val LOG_TAG = this.javaClass.name
-    private var genreFilter: String = ALL_GENRES
-    var genericFilter: String = ALL_GENRES
 
     var genres: MutableList<String> = mutableListOf()
     var movies: List<Movie> = listOf()
+    var hasNoData = false
 
-    private var comparator: Comparator<Movie> = MovieComparator.BY_DATE_DESC
     val nasService = NasService(nasUrl)
-    val openMovieService = OpenMovieService(openMovieUrl, openMovieApiKey)
     val duneHdService = DuneHdService(duneIp, nasUrl)
-
-    var sortingGenre: String = ALL_GENRES
 
     init {
         loadCatalog()
-        genres = mutableListOf(ALL_GENRES)
-        genres.addAll(movies.flatMap { it.genres }.toList().distinct().sorted())
+        updateGenres()
         Log.d(LOG_TAG, "Loaded movies: $movies")
         Log.d(LOG_TAG, "Loaded genres: $genres")
     }
@@ -63,11 +59,13 @@ class MoviesCatalog(val context: Context, nasUrl: String, openMovieUrl: String, 
                     }
                 }
             }
-        } catch (ex: Exception) {
-            Log.e(LOG_TAG, "No catalog file $catalogFileName on device.", ex)
+            movies = movies.sortedWith(MovieComparator.BY_DATE_DESC)
+            Log.d(LOG_TAG, "Movies: ${movies}")
         }
-        movies = movies.sortedWith(MovieComparator.BY_DATE_DESC)
-        Log.d(LOG_TAG, "Movies: ${movies}")
+        catch (ex: Exception) {
+            Log.e(LOG_TAG, "No catalog file $MOVIE_CATALOG_FILENAME on private dir.", ex)
+            hasNoData = true
+        }
     }
 
     fun saveBitmap(thumbFilename: String, image: Bitmap) {
@@ -82,6 +80,12 @@ class MoviesCatalog(val context: Context, nasUrl: String, openMovieUrl: String, 
 
     fun deleteAll() {
         context.getFilesDir().listFiles().forEach { it.delete() }
+    }
+
+    fun updateGenres() {
+        genres.clear()
+        genres.add(ALL_GENRES)
+        genres.addAll(movies.flatMap { it.genres }.toList().distinct().sorted())
     }
 }
 

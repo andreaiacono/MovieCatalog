@@ -29,9 +29,15 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
         indefiniteProgressBar.isIndeterminate = true
         object : Thread() {
             override fun run() {
-                result = moviesCatalog.nasService.getTitles(moviesCatalog.movies)
-                horizontalProgressBar.max = result.first.size
-                indefiniteProgressBar.visibility = View.GONE
+                try {
+                    result = moviesCatalog.nasService.getTitles(moviesCatalog.movies)
+                    horizontalProgressBar.max = result.first.size
+                    indefiniteProgressBar.visibility = View.GONE
+                }
+                catch (ex:Exception) {
+                    exception = ex
+                    indefiniteProgressBar.visibility = View.GONE
+                }
                 isReady = true
             }
         }.start()
@@ -45,6 +51,10 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
     }
 
     override fun doInBackground(vararg url: String): Void? {
+        if (exception != null) {
+            // if there was an error in onPreExecute(), just stops here
+            return null
+        }
         Log.d(LOG_TAG, "Loading XML data from NAS")
         try {
             if (!result.second.isEmpty()) {

@@ -4,8 +4,11 @@
     <string name="action_info">Info</string>
     <string name="info_title">Information</string>
     <string name="delete_info">Delete all data</string>
-    <string name="list_files">List files</string>
+    <string name="debug_info">Debug info</string>
     <string name="trailer">YouTube Trailer</string>
     <string name="play">Play</string>
     <string name="movie_image_description">The full image fo the movie</string>
+    <string name="action_sort">Sort</string>
+    <string name="sort_by_title">Sort by Title</string>
+    <string name="sort_by_date">Sort by Date</string>
 </resources>
