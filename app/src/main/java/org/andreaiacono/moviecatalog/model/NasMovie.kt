@@ -43,7 +43,8 @@ data class NasMovie (
     @JacksonXmlElementWrapper(localName = "genres")
     val genres: List<String> = listOf(),
 
-    val dirName: String = ""
+    val dirName: String = "",
+    val videoFilename: String = ""
 )
 
 fun fromXml(xml: String): NasMovie = kotlinXmlMapper.readValue(xml, Details::class.java).movie

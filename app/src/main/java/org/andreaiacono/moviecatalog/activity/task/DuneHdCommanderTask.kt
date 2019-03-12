@@ -2,12 +2,12 @@ package org.andreaiacono.moviecatalog.activity.task
 
 import android.os.AsyncTask
 import android.util.Log
-import org.andreaiacono.moviecatalog.core.MoviesCatalog
+import org.andreaiacono.moviecatalog.service.DuneHdService
 import org.andreaiacono.moviecatalog.ui.AsyncTaskType
 import org.andreaiacono.moviecatalog.ui.PostTaskListener
 import java.util.*
 
-internal class DuneHdCommanderTask(taskListener: PostTaskListener<Any>, val moviesCatalog: MoviesCatalog) :
+internal class DuneHdCommanderTask(taskListener: PostTaskListener<Any>, val duneHdService: DuneHdService) :
     AsyncTask<String, Void, Void>() {
 
     private val syncTaskType: AsyncTaskType = AsyncTaskType.DUNE_HD_COMMANDER
@@ -20,7 +20,7 @@ internal class DuneHdCommanderTask(taskListener: PostTaskListener<Any>, val movi
 
     override fun doInBackground(vararg names: String): Void? {
         Log.d(LOG_TAG, "names: ${Arrays.toString(names)}")
-        val response = moviesCatalog.duneHdService.startMovie(names[0], names[1])
+        val response = duneHdService.startMovie(names[0], names[1])
         Log.i(LOG_TAG, "Dune call returned $response")
         // if response is false, throws exception
         result = "Movie ${names[0]} started"

@@ -7,8 +7,9 @@ data class Movie (
     val title: String,
     val date: Date,
     val dirName: String,
+    val videoFileName: String,
     val genres: List<String> = listOf(),
     val thumbName: String
 ) : Serializable
 
-val EMPTY_MOVIE = Movie("", Date(0L), "", thumbName = "")
+val EMPTY_MOVIE = Movie("", Date(0L), "", thumbName = "", videoFileName = "")

@@ -7,6 +7,7 @@ import jcifs.smb.SmbFile
 import org.andreaiacono.moviecatalog.model.Movie
 import org.andreaiacono.moviecatalog.model.NasMovie
 import org.andreaiacono.moviecatalog.model.fromXml
+import org.andreaiacono.moviecatalog.util.MOVIE_EXTENSIONS
 import java.io.InputStream
 import java.io.Serializable
 import java.util.*
@@ -32,6 +33,14 @@ class NasReader(val url: String) : Serializable {
                     .filter { it.name.toLowerCase().endsWith(".xml") }
                     .toList()
 
+                val movieFiles = movieDir
+                    .listFiles()
+                    .filter { it.name.takeLast(3).toLowerCase() in MOVIE_EXTENSIONS }
+                    .toList()
+                if (movieFiles.size != 1) {
+                    Log.e(LOG_TAG, "Video files found: $movieFiles")
+                }
+
                 try {
                     if (!xmlFiles.isEmpty()) {
                         // assumes there's only one xml file in each dir
@@ -44,7 +53,8 @@ class NasReader(val url: String) : Serializable {
                                 xmlMovie.sortingTitle ?: xmlMovie.title,
                                 if (xmlMovie.date.time > 0L) xmlMovie.date else Date(movieDir.date),
                                 xmlMovie.genres,
-                                movieDir.name
+                                movieDir.name,
+                                movieFiles[0].name
                             )
                         )
                     }

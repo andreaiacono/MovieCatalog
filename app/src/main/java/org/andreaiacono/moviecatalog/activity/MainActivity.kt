@@ -51,6 +51,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                                 it.title,
                                 it.date,
                                 it.dirName,
+                                it.videoFilename,
                                 it.genres,
                                 thumbNameNormalizer(it.title)
                             )
@@ -61,6 +62,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                 AsyncTaskType.FILE_SYSTEM_IMAGE_LOAD -> {
                     movieBitmaps = result as ArrayList<MovieBitmap>
                     if (!movieBitmaps.isEmpty()) {
+                        Log.d(LOG_TAG, "ImageAdapter loaded with $movieBitmaps")
                         imageAdapter = ImageAdapter(this, movieBitmaps)
                         gridView.adapter = imageAdapter
                     } else {
@@ -84,7 +86,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             "smb://192.168.1.90/Volume_1/movies/",
             "http://www.omdbapi.com/",
             "13c1fc2a",
-            "192.168.1.83"
+            "192.168.1.87"
         )
         val toolbar: Toolbar = findViewById(R.id.mainToolbar)
         setSupportActionBar(toolbar)
@@ -100,27 +102,28 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         gridView = findViewById(R.id.moviesGridView)
         gridView.onItemClickListener = AdapterView.OnItemClickListener { parent, v, position, id ->
             val fullScreenIntent = Intent(v.context, MovieDetailActivity::class.java)
-            fullScreenIntent.putExtra("position", moviesCatalog.movies[position].dirName)
+            fullScreenIntent.putExtra("movie", moviesCatalog.movies[position])
             fullScreenIntent.putExtra("NasService", moviesCatalog.nasService as Serializable)
+            fullScreenIntent.putExtra("DuneHdService", moviesCatalog.duneHdService as Serializable)
 
             startActivity(fullScreenIntent)
         }
 
         val nasProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
 
-        if (savedInstanceState?.get("movieBitmaps") != null) {
-            movieBitmaps = savedInstanceState.getParcelableArrayList("movieBitmaps")
-            imageAdapter = ImageAdapter(this, movieBitmaps)
-            gridView.adapter = imageAdapter
-        } else {
+//        if (savedInstanceState?.get("movieBitmaps") != null) {
+//            movieBitmaps = savedInstanceState.getParcelableArrayList("movieBitmaps")
+//            imageAdapter = ImageAdapter(this, movieBitmaps)
+//            gridView.adapter = imageAdapter
+//        } else {
             FileSystemImageLoaderTask(this, moviesCatalog, nasProgressBar).execute()
-        }
+//        }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putParcelableArrayList("movieBitmaps", movieBitmaps)
-    }
+//    override fun onSaveInstanceState(outState: Bundle) {
+//        super.onSaveInstanceState(outState)
+//        outState.putParcelableArrayList("movieBitmaps", movieBitmaps)
+//    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)

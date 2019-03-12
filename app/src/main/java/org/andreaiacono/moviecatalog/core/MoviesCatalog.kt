@@ -40,14 +40,6 @@ class MoviesCatalog(val context: Context, nasUrl: String, openMovieUrl: String, 
 
     fun getCount() = movies.size
 
-    fun setGenreFilter(genre: String) {
-        sortingGenre = genre
-    }
-
-    fun searchMovie(title: String): Search {
-        return openMovieService.searchMovie(title)
-    }
-
     fun saveCatalog() {
         val catalogFileName = "${context.filesDir}/$MOVIE_CATALOG_FILENAME"
         try {
@@ -72,10 +64,10 @@ class MoviesCatalog(val context: Context, nasUrl: String, openMovieUrl: String, 
                 }
             }
         } catch (ex: Exception) {
-            Log.e(LOG_TAG, "No catalog file $catalogFileName on device.")
+            Log.e(LOG_TAG, "No catalog file $catalogFileName on device.", ex)
         }
-        movies = movies.sortedWith(MovieComparator.BY_DATE_DESC)
-        Log.d(LOG_TAG, "Movie: ${movies[0]}")
+        movies = movies.sortedWith(MovieComparator.BY_DATE_DESC).take(5)
+        Log.d(LOG_TAG, "Movies: ${movies}")
     }
 
     fun saveBitmap(thumbFilename: String, image: Bitmap) {
