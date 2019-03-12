@@ -5,11 +5,13 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.os.Parcel
 import android.os.Parcelable
+import android.util.Log
 import android.util.TypedValue
 import android.widget.*
 import android.view.*
 import org.andreaiacono.moviecatalog.core.ALL_GENRES
 import org.andreaiacono.moviecatalog.model.Movie
+import java.util.Comparator
 
 data class MovieBitmap(val movie: Movie, val bitmap: Bitmap) : Parcelable {
 
@@ -34,20 +36,23 @@ data class MovieBitmap(val movie: Movie, val bitmap: Bitmap) : Parcelable {
     }
 }
 
+
 class ImageAdapter(val context: Context, val movieBitmaps: List<MovieBitmap>) : BaseAdapter() {
 
+    val LOG_TAG = this.javaClass.name
+    
     val r = Resources.getSystem()
     val pxWidth = (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 80f, r.getDisplayMetrics())).toInt()
     val pxHeight = (pxWidth * 1.5).toInt()
+    var comparator: MovieComparator = MovieComparator.BY_DATE_ASC
 
     var filteredBitmaps: List<MovieBitmap> = movieBitmaps.toList()
 
     fun filterByGenre(genreFilter: String) {
-        if (genreFilter == ALL_GENRES) {
-            filteredBitmaps = movieBitmaps.toList()
-        }
-        else {
-            filteredBitmaps = movieBitmaps.filter { it.movie.genres.contains(genreFilter) }.toList()
+        filteredBitmaps = if (genreFilter == ALL_GENRES) {
+            movieBitmaps.toList()
+        } else {
+            movieBitmaps.filter { it.movie.genres.contains(genreFilter) }.toList()
         }
     }
 
@@ -71,5 +76,51 @@ class ImageAdapter(val context: Context, val movieBitmaps: List<MovieBitmap>) : 
 
         imageView.setImageBitmap(this.filteredBitmaps[position].bitmap)
         return imageView
+    }
+
+    fun setTitleComparator() {
+        comparator = if (comparator === MovieComparator.BY_TITLE_ASC) {
+            MovieComparator.BY_TITLE_DESC
+        }
+        else {
+            MovieComparator.BY_TITLE_ASC
+        }
+        // in place sort
+        java.util.Collections.sort(filteredBitmaps, comparator)
+    }
+
+    fun setDateComparator() {
+        comparator = if (comparator === MovieComparator.BY_DATE_ASC) {
+            MovieComparator.BY_DATE_DESC
+        }
+        else {
+            MovieComparator.BY_DATE_ASC
+        }
+        // in place sort
+        java.util.Collections.sort(filteredBitmaps, comparator)
+    }
+}
+
+
+enum class MovieComparator : Comparator<MovieBitmap> {
+    BY_TITLE_ASC {
+        override fun compare(m1: MovieBitmap, m2: MovieBitmap): Int {
+            return m1.movie.title.compareTo(m2.movie.title)
+        }
+    },
+    BY_DATE_ASC {
+        override fun compare(m1: MovieBitmap, m2: MovieBitmap): Int {
+            return m1.movie.date.compareTo(m2.movie.date)
+        }
+    },
+    BY_TITLE_DESC {
+        override fun compare(m1: MovieBitmap, m2: MovieBitmap): Int {
+            return -BY_TITLE_ASC.compare(m1, m2)
+        }
+    },
+    BY_DATE_DESC {
+        override fun compare(m1: MovieBitmap, m2: MovieBitmap): Int {
+            return -BY_DATE_ASC.compare(m1, m2)
+        }
     }
 }

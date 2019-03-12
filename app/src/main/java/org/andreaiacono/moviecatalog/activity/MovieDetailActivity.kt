@@ -29,10 +29,13 @@ class MovieDetailActivity : PostTaskListener<Any>, AppCompatActivity() {
 
         if (exception != null) {
             Log.d(LOG_TAG, exception.message, exception)
-            val toast = Toast.makeText(applicationContext, "An error occurred while executing $asyncTaskType: ${exception.message}", Toast.LENGTH_LONG)
+            val toast = Toast.makeText(
+                applicationContext,
+                "An error occurred while executing $asyncTaskType: ${exception.message}",
+                Toast.LENGTH_LONG
+            )
             toast.show()
-        }
-        else {
+        } else {
             when (asyncTaskType) {
                 AsyncTaskType.NAS_IMAGE_LOAD -> {
                     imageView.setImageBitmap(result as Bitmap)
@@ -40,7 +43,10 @@ class MovieDetailActivity : PostTaskListener<Any>, AppCompatActivity() {
                 AsyncTaskType.DUNE_HD_COMMANDER -> {
                     val toast = Toast.makeText(applicationContext, result as String, Toast.LENGTH_LONG)
                     toast.show()
-                }}
+                }
+                else -> {
+                }
+            }
         }
     }
 
@@ -58,8 +64,8 @@ class MovieDetailActivity : PostTaskListener<Any>, AppCompatActivity() {
         imageView = findViewById(R.id.movie_fullscreen_view)
 
         movie = intent.extras.get("movie") as Movie
-        val nasService =  intent.extras.get("NasService") as NasService
-        duneHdService =  intent.extras.get("DuneHdService") as DuneHdService
+        val nasService = intent.extras.get("NasService") as NasService
+        duneHdService = intent.extras.get("DuneHdService") as DuneHdService
         NasImageLoaderTask(this, nasService, movie.dirName).execute()
     }
 
@@ -73,13 +79,11 @@ class MovieDetailActivity : PostTaskListener<Any>, AppCompatActivity() {
         return when (item.itemId) {
 
             R.id.action_trailer -> {
-                if (movie != null) {
-                    val intent = Intent(Intent.ACTION_SEARCH)
-                    intent.setPackage("com.google.android.youtube")
-                    intent.putExtra("query", movie.title + " trailer ita")
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intent)
-                }
+                val intent = Intent(Intent.ACTION_SEARCH)
+                intent.setPackage("com.google.android.youtube")
+                intent.putExtra("query", movie.title + " trailer ita")
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
                 true
             }
             R.id.action_play -> {

@@ -67,6 +67,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                     movieBitmaps = result as ArrayList<MovieBitmap>
                     if (!movieBitmaps.isEmpty()) {
                         imageAdapter = ImageAdapter(this, movieBitmaps)
+                        imageAdapter.setDateComparator()
                         gridView.adapter = imageAdapter
                         genresAdapter.notifyDataSetChanged()
                     }
@@ -74,6 +75,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                 AsyncTaskType.DUNE_HD_COMMANDER -> {
                     shortToast(result.toString())
                 }
+                else -> {}
             }
     }
 
@@ -97,13 +99,13 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         genresAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, moviesCatalog.genres)
         genresListView.adapter = genresAdapter
 
-        genresListView.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, i, l ->
+        genresListView.onItemClickListener = AdapterView.OnItemClickListener { _, _, i, _ ->
             imageAdapter.filterByGenre(genresListView.getAdapter().getItem(i).toString())
             imageAdapter.notifyDataSetChanged()
         }
 
         gridView = findViewById(R.id.moviesGridView)
-        gridView.onItemClickListener = AdapterView.OnItemClickListener { parent, v, position, id ->
+        gridView.onItemClickListener = AdapterView.OnItemClickListener { _, v, position, _ ->
             val fullScreenIntent = Intent(v.context, MovieDetailActivity::class.java)
             fullScreenIntent.putExtra("movie", (imageAdapter.getItem(position) as MovieBitmap).movie)
             fullScreenIntent.putExtra("NasService", moviesCatalog.nasService as Serializable)
@@ -165,6 +167,16 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                     Log.d(LOG_TAG, files)
                 }
                 startActivity(sendIntent)
+                true
+            }
+            R.id.menuSortByTitle -> {
+                imageAdapter.setTitleComparator()
+                imageAdapter.notifyDataSetChanged()
+                true
+            }
+            R.id.menuSortByDate -> {
+                imageAdapter.setDateComparator()
+                imageAdapter.notifyDataSetChanged()
                 true
             }
             else -> super.onOptionsItemSelected(item)

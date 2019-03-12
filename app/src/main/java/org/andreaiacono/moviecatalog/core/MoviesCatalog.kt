@@ -8,7 +8,6 @@ import org.andreaiacono.moviecatalog.service.DuneHdService
 import org.andreaiacono.moviecatalog.service.NasService
 import org.andreaiacono.moviecatalog.util.MOVIE_CATALOG_FILENAME
 import java.io.*
-import java.util.*
 
 
 val ALL_GENRES = "No Filter"
@@ -59,7 +58,6 @@ class MoviesCatalog(
                     }
                 }
             }
-            movies = movies.sortedWith(MovieComparator.BY_DATE_DESC)
             Log.d(LOG_TAG, "Movies: ${movies}")
         }
         catch (ex: Exception) {
@@ -87,27 +85,6 @@ class MoviesCatalog(
         genres.add(ALL_GENRES)
         genres.addAll(movies.flatMap { it.genres }.toList().distinct().sorted())
     }
-}
 
-private enum class MovieComparator : Comparator<Movie> {
-    BY_TITLE_ASC {
-        override fun compare(m1: Movie, m2: Movie): Int {
-            return m1.title.compareTo(m2.title)
-        }
-    },
-    BY_DATE_ASC {
-        override fun compare(m1: Movie, m2: Movie): Int {
-            return m1.date.compareTo(m2.date)
-        }
-    },
-    BY_TITLE_DESC {
-        override fun compare(m1: Movie, m2: Movie): Int {
-            return -BY_TITLE_ASC.compare(m1, m2)
-        }
-    },
-    BY_DATE_DESC {
-        override fun compare(m1: Movie, m2: Movie): Int {
-            return -BY_DATE_ASC.compare(m1, m2)
-        }
-    }
+
 }
