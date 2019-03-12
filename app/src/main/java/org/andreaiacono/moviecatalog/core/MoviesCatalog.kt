@@ -66,7 +66,7 @@ class MoviesCatalog(val context: Context, nasUrl: String, openMovieUrl: String, 
         } catch (ex: Exception) {
             Log.e(LOG_TAG, "No catalog file $catalogFileName on device.", ex)
         }
-        movies = movies.sortedWith(MovieComparator.BY_DATE_DESC).take(5)
+        movies = movies.sortedWith(MovieComparator.BY_DATE_DESC)
         Log.d(LOG_TAG, "Movies: ${movies}")
     }
 
