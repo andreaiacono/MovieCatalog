@@ -18,7 +18,7 @@ internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, va
 
     val LOG_TAG = this.javaClass.name
     private var exception: Exception? = null
-    private var movieBitmaps: MutableList<MovieBitmap> = mutableListOf(MovieBitmap(EMPTY_MOVIE, Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8)))
+    private var movieBitmaps: MutableList<MovieBitmap> = mutableListOf()
     private var postTaskListener: PostTaskListener<Any> = taskListener
 
     override fun onPreExecute() {
@@ -32,7 +32,6 @@ internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, va
         moviesCatalog.movies.forEachIndexed {index, movie ->
             try {
                 val filename = "${moviesCatalog.context.filesDir}/${movie.thumbName}"
-                Log.d(LOG_TAG, "Loading image $filename")
                 movieBitmaps.add(MovieBitmap(movie, BitmapFactory.decodeFile(filename)))
                 publishProgress(index as Integer)
             }
@@ -40,6 +39,9 @@ internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, va
                 this.exception = e
                 Log.e(LOG_TAG, "Error while loading image $dirName: ${e.message}")
             }
+        }
+        if (movieBitmaps.isEmpty()) {
+            movieBitmaps= mutableListOf(MovieBitmap(EMPTY_MOVIE, Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8)))
         }
         return null
     }
