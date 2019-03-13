@@ -25,12 +25,15 @@ import java.io.Serializable
 import android.view.Gravity
 import android.view.View
 import android.widget.TextView
-
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import org.andreaiacono.moviecatalog.model.Config
 
 class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
     val LOG_TAG = this.javaClass.name
 
+    private lateinit var config: Config
     private lateinit var gridView: GridView
     private lateinit var genresListView: ListView
     private lateinit var moviesCatalog: MoviesCatalog
@@ -79,17 +82,17 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
+        config = loadConfig();
         moviesCatalog = MoviesCatalog(
             this,
-            "smb://192.168.1.90/Volume_1/movies/",
-            "192.168.1.87"
+            config.nasUrl,
+            config.duneIp
         )
 
         val toolbar: Toolbar = findViewById(R.id.mainToolbar)
@@ -127,6 +130,11 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         }
     }
 
+    fun loadConfig(): Config {
+        val mapper = ObjectMapper(YAMLFactory())
+        return mapper.readValue(resources.openRawResource(R.raw.config), Config::class.java)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
@@ -161,7 +169,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                 val sendIntent: Intent = Intent().apply {
                     action = Intent.ACTION_SEND
                     val files =
-                        "<PRE>Private directory content: \n${filesDir.list().map { "[$it]" }.joinToString("\n")}</PRE>"
+                        "<PRE>Config: $config</br>Private directory content: \n${filesDir.list().map { "[$it]" }.joinToString("\n")}</PRE>"
                     putExtra(Intent.EXTRA_TEXT, files)
                     type = "text/plain"
                     Log.d(LOG_TAG, files)
