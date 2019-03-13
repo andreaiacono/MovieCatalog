@@ -1,5 +1,0 @@
-networkFolder: smb://192.168.1.1/shared/public/photos
-networkUsername: guest
-networkPassword: passwd
-openMovieUrl: http://www.omdbapi.com/
-openMovieApiKey: 13c1fc2a
