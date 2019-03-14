@@ -16,6 +16,12 @@ class NasReader(val url: String) : Serializable {
 
     val LOG_TAG = this.javaClass.name
 
+    fun getMoviesDirectories(): List<String> {
+
+        val moviesRoot = SmbFile(url)
+        return moviesRoot.listFiles().map { it.name }.toList()
+    }
+
     fun getMovies(alreadyPresentNasMovies: List<Movie>): Pair<List<NasMovie>, List<String>> {
 
         val existingMoviesDirs = alreadyPresentNasMovies.map { it.dirName }.toList()

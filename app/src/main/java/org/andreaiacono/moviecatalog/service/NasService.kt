@@ -10,6 +10,8 @@ class NasService(url: String) : Serializable {
 
     private val nasReader = NasReader(url)
 
+    fun getMoviesDirectories(): List<String> = nasReader.getMoviesDirectories()
+
     fun getTitles(existingMovies: List<Movie>): Pair<List<NasMovie>, List<String>> = nasReader.getMovies(existingMovies)
 
     fun getThumbnail(movieDir: String) = nasReader.getThumb(movieDir)

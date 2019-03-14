@@ -50,7 +50,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         } else
             when (asyncTaskType) {
                 AsyncTaskType.NAS_SCAN -> {
-                    moviesCatalog.movies = (result as List<NasMovie>)
+                    val newMovies = (result as List<NasMovie>)
                         .map {
                             Movie(
                                 it.title,
@@ -62,10 +62,19 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                             )
                         }
                         .toList()
-                    moviesCatalog.updateGenres()
-                    moviesCatalog.saveCatalog()
-                    val nasProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
-                    FileSystemImageLoaderTask(this, moviesCatalog, nasProgressBar).execute()
+                    if (newMovies.isEmpty()) {
+                        shortToast("No new movies found")
+                    }
+                    else {
+                        val movies = moviesCatalog.movies.toMutableList()
+                        Log.d(LOG_TAG, "Added movies: $newMovies")
+                        movies.addAll(newMovies)
+                        moviesCatalog.movies = movies
+                        moviesCatalog.updateGenres()
+                        moviesCatalog.saveCatalog()
+                        val nasProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
+                        FileSystemImageLoaderTask(this, moviesCatalog, nasProgressBar).execute()
+                    }
                 }
                 AsyncTaskType.FILE_SYSTEM_IMAGE_LOAD -> {
                     movieBitmaps = result as ArrayList<MovieBitmap>
@@ -79,7 +88,8 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                 AsyncTaskType.DUNE_HD_COMMANDER -> {
                     shortToast(result.toString())
                 }
-                else -> {}
+                else -> {
+                }
             }
     }
 
@@ -99,7 +109,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.mainToolbar)
         setSupportActionBar(toolbar)
 
-        genresListView= findViewById(R.id.genresListView)
+        genresListView = findViewById(R.id.genresListView)
         genresAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, moviesCatalog.genres)
         genresListView.adapter = genresAdapter
 
@@ -172,7 +182,10 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                     activityManager.getMemoryInfo(memoryInfo)
 
                     action = Intent.ACTION_SEND
-                    val files = "Config: $config\n\nMemory info: ${memoryInfo.lowMemory}\n\nPrivate directory content: \n${filesDir.list().map { "[$it]" }.joinToString("\n")}"
+                    val files =
+                        "Config: $config\n\nMemory info: ${memoryInfo.lowMemory}\n\nPrivate directory content: \n${filesDir.list().map { "[$it]" }.joinToString(
+                            "\n"
+                        )}"
                     putExtra(Intent.EXTRA_TEXT, files)
                     type = "text/plain"
                     Log.d(LOG_TAG, files)

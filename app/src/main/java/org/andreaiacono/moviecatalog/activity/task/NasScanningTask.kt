@@ -20,7 +20,6 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
     private var exception: Exception? = null
     private var movies: List<NasMovie> = listOf()
     private var postTaskListener: PostTaskListener<Any> = taskListener
-    lateinit var result: Pair<List<NasMovie>, List<String>>
     var isReady: Boolean = false
 
     override fun onPreExecute() {
@@ -30,14 +29,13 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
         object : Thread() {
             override fun run() {
                 try {
-                    result = moviesCatalog.nasService.getTitles(moviesCatalog.movies)
-                    horizontalProgressBar.max = result.first.size
-                    indefiniteProgressBar.visibility = View.GONE
+                    val dirs = moviesCatalog.nasService.getMoviesDirectories()
+                    horizontalProgressBar.max = dirs.size
                 }
                 catch (ex:Exception) {
                     exception = ex
-                    indefiniteProgressBar.visibility = View.GONE
                 }
+                indefiniteProgressBar.visibility = View.GONE
                 isReady = true
             }
         }.start()
@@ -57,9 +55,7 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
         }
         Log.d(LOG_TAG, "Loading XML data from NAS")
         try {
-            if (!result.second.isEmpty()) {
-                e(this.LOG_TAG, ("Not processed movies: ${result.second}"))
-            }
+            val result = moviesCatalog.nasService.getTitles(moviesCatalog.movies)
             movies = result.first
             Log.d(LOG_TAG, "NAS new data: $movies")
             movies.forEachIndexed { index, movie ->
