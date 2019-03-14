@@ -28,6 +28,7 @@ import android.widget.TextView
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import org.andreaiacono.moviecatalog.model.Config
+import android.app.ActivityManager
 
 class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
@@ -151,10 +152,9 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             }
             R.id.action_info -> {
                 val builder = AlertDialog.Builder(this)
-                val ip = "192.168.1.0"
-                val message = "Ip Address Dune HD: $ip" +
-                        "\nAPI version: 5" +
-                        "\nMovies number: " + moviesCatalog.getCount()
+                val message = "Ip Address Dune HD: ${config.duneIp}" +
+                        "\nNAS Url: ${config.nasUrl}" +
+                        "\nSaved Movies: " + moviesCatalog.getCount()
                 builder.setMessage(message).setTitle(R.string.info_title)
                 val dialog = builder.create()
                 dialog.show()
@@ -167,9 +167,12 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             }
             R.id.action_debugInfo -> {
                 val sendIntent: Intent = Intent().apply {
+                    val activityManager = applicationContext.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+                    val memoryInfo = ActivityManager.MemoryInfo()
+                    activityManager.getMemoryInfo(memoryInfo)
+
                     action = Intent.ACTION_SEND
-                    val files =
-                        "<PRE>Config: $config</br>Private directory content: \n${filesDir.list().map { "[$it]" }.joinToString("\n")}</PRE>"
+                    val files = "Config: $config\n\nMemory info: ${memoryInfo.lowMemory}\n\nPrivate directory content: \n${filesDir.list().map { "[$it]" }.joinToString("\n")}"
                     putExtra(Intent.EXTRA_TEXT, files)
                     type = "text/plain"
                     Log.d(LOG_TAG, files)
