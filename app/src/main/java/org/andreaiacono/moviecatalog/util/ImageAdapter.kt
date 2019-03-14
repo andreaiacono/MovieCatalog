@@ -5,7 +5,6 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.os.Parcel
 import android.os.Parcelable
-import android.util.Log
 import android.util.TypedValue
 import android.widget.*
 import android.view.*
@@ -42,11 +41,11 @@ class ImageAdapter(val context: Context, val movieBitmaps: List<MovieBitmap>) : 
     val LOG_TAG = this.javaClass.name
     
     val r = Resources.getSystem()
-    val pxWidth = (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 80f, r.getDisplayMetrics())).toInt()
+    val pxWidth = (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180f, r.getDisplayMetrics())).toInt()
     val pxHeight = (pxWidth * 1.5).toInt()
     var comparator: MovieComparator = MovieComparator.BY_DATE_ASC
 
-    var filteredBitmaps: List<MovieBitmap> = movieBitmaps.toList()
+    var filteredBitmaps: List<MovieBitmap> = movieBitmaps.toMutableList()
 
     fun filterByGenre(genreFilter: String) {
         filteredBitmaps = if (genreFilter == ALL_GENRES) {
