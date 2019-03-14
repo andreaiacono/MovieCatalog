@@ -5,13 +5,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
+    android:background="@color/darkBackground"
     android:layout_height="match_parent"
-    android:background="?attr/colorPrimaryDark"
     android:fitsSystemWindows="true"
     tools:context=".activity.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
+        android:background="@color/darkBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -19,7 +20,6 @@
             android:id="@+id/mainToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimaryDark"
             app:layout_scrollFlags="scroll|enterAlways" />
     </android.support.design.widget.AppBarLayout>
 
