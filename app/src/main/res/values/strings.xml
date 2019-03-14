@@ -2,7 +2,7 @@
     <string name="app_name">Movie Catalog</string>
     <string name="action_scan">Scan</string>
     <string name="action_info">Info</string>
-    <string name="info_title">Information</string>
+    <string name="info_title">Movie Catalog</string>
     <string name="delete_info">Delete all data</string>
     <string name="debug_info">Debug info</string>
     <string name="trailer">YouTube Trailer</string>
