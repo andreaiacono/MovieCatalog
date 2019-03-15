@@ -3,7 +3,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorPrimaryDark">
+    android:background="@color/darkBackground">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/detail_appbar"
@@ -14,7 +14,8 @@
             android:id="@+id/movieDetailToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimaryDark" />
+            android:background="@color/darkBackground" />
+
     </android.support.design.widget.AppBarLayout>
 
     <RelativeLayout
@@ -27,6 +28,7 @@
             android:id="@+id/movie_fullscreen_view"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:background="@color/darkBackground"
             android:contentDescription="@string/movie_image_description" />
     </RelativeLayout>
 
