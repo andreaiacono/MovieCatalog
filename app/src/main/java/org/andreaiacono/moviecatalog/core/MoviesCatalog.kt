@@ -46,7 +46,7 @@ class MoviesCatalog(
         }
     }
 
-    fun loadCatalog() {
+    private fun loadCatalog() {
         val catalogFileName = "${context.filesDir}/$MOVIE_CATALOG_FILENAME"
         try {
             ObjectInputStream(FileInputStream(catalogFileName)).use {

@@ -2,40 +2,41 @@ package org.andreaiacono.moviecatalog.activity.task
 
 import android.os.AsyncTask
 import android.util.Log
-import android.util.Log.e
 import android.view.View
 import android.widget.ProgressBar
+import jcifs.smb.SmbFile
 import org.andreaiacono.moviecatalog.core.MoviesCatalog
 import org.andreaiacono.moviecatalog.ui.AsyncTaskType
 import org.andreaiacono.moviecatalog.ui.PostTaskListener
 import org.andreaiacono.moviecatalog.model.NasMovie
+import org.andreaiacono.moviecatalog.model.fromXml
+import org.andreaiacono.moviecatalog.util.MOVIE_EXTENSIONS
 import org.andreaiacono.moviecatalog.util.thumbNameNormalizer
+import java.util.*
 
-internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCatalog: MoviesCatalog, val horizontalProgressBar: ProgressBar, val indefiniteProgressBar: ProgressBar) :
+internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCatalog: MoviesCatalog, val horizontalProgressBar: ProgressBar) :
     AsyncTask<String, Integer, Void>() {
 
     val asyncTaskType = AsyncTaskType.NAS_SCAN
 
     private var LOG_TAG = this.javaClass.name
     private var exception: Exception? = null
-    private var movies: List<NasMovie> = listOf()
+    private var movies: MutableList<NasMovie> = mutableListOf()
     private var postTaskListener: PostTaskListener<Any> = taskListener
     var isReady: Boolean = false
 
+    lateinit var movieDirs: Array<SmbFile>
+
     override fun onPreExecute() {
         super.onPreExecute()
-        indefiniteProgressBar.visibility = View.VISIBLE
-        indefiniteProgressBar.isIndeterminate = true
         object : Thread() {
             override fun run() {
                 try {
-                    val dirs = moviesCatalog.nasService.getMoviesDirectories()
-                    horizontalProgressBar.max = dirs.size
-                }
-                catch (ex:Exception) {
+                    movieDirs = moviesCatalog.nasService.getMoviesDirectories()
+                    horizontalProgressBar.max = movieDirs.size
+                } catch (ex: Exception) {
                     exception = ex
                 }
-                indefiniteProgressBar.visibility = View.GONE
                 isReady = true
             }
         }.start()
@@ -53,20 +54,59 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
             // if there was an error in onPreExecute(), just stops here
             return null
         }
-        Log.d(LOG_TAG, "Loading XML data from NAS")
+        val existingDirNames = moviesCatalog.movies.map { it.dirName }.toList()
+
         try {
-            val result = moviesCatalog.nasService.getTitles(moviesCatalog.movies)
-            movies = result.first
-            Log.d(LOG_TAG, "NAS new data: $movies")
-            movies.forEachIndexed { index, movie ->
-                Log.d(LOG_TAG, "Scanning $movie")
+            movieDirs.forEachIndexed { index, movieDir ->
+
                 publishProgress(index as Integer)
-                try {
-                    val thumbFilename = thumbNameNormalizer(movie.title)
-                    Log.d(LOG_TAG, "Saving $thumbFilename (dirnmae=${movie.dirName})")
-                    moviesCatalog.saveBitmap(thumbFilename, moviesCatalog.nasService.getThumbnail(movie.dirName))
-                } catch (ex: Exception) {
-                    Log.e(LOG_TAG, ex.message, ex)
+                Log.d(LOG_TAG, "Reading file ${movieDir.name}")
+                if (movieDir.isDirectory && !existingDirNames.contains(movieDir.name)) {
+                    val xmlFiles = movieDir
+                        .listFiles()
+                        .filter { !it.name.startsWith(".") }
+                        .filter { it.name.toLowerCase().endsWith(".xml") }
+                        .toList()
+
+                    val movieFiles = movieDir
+                        .listFiles()
+                        .filter { it.name.takeLast(3).toLowerCase() in MOVIE_EXTENSIONS }
+                        .toList()
+                    if (movieFiles.size != 1) {
+                        Log.e(LOG_TAG, "Video files found: $movieFiles")
+                    }
+
+                    try {
+                        if (!xmlFiles.isEmpty()) {
+
+                            // assumes there's only one xml file in each dir
+                            val xmlContent = xmlFiles[0].inputStream.readBytes().toString(Charsets.UTF_8)
+                            val xmlMovie = fromXml(xmlContent)
+                            Log.d(LOG_TAG, xmlMovie.toString())
+                            movies.add(
+                                NasMovie(
+                                    xmlMovie.title,
+                                    xmlMovie.sortingTitle ?: xmlMovie.title,
+                                    if (xmlMovie.date.time > 0L) xmlMovie.date else Date(movieDir.listFiles("folder.jpg").first().date),
+                                    xmlMovie.genres,
+                                    movieDir.name,
+                                    movieFiles[0].name
+                                )
+                            )
+
+                            val thumbFilename = thumbNameNormalizer(xmlMovie.title)
+                            Log.d(LOG_TAG, "Saving $thumbFilename (dirName=${movieDir.name})")
+                            moviesCatalog.saveBitmap(
+                                thumbFilename,
+                                moviesCatalog.nasService.getThumbnail(movieDir.name)
+                            )
+                        }
+                        else {
+                            Log.e(LOG_TAG, "Xml file not found in [$movieDir]")
+                        }
+                    } catch (ex: Throwable) {
+                        Log.e(LOG_TAG, "Error occurred on $movieDir: ${ex.message}")
+                    }
                 }
             }
         } catch (e: Exception) {

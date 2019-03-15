@@ -62,7 +62,7 @@
             android:id="@+id/horizontalProgressBar"
             style="@android:style/Widget.Holo.ProgressBar.Horizontal"
             android:layout_width="@android:dimen/thumbnail_width"
-            android:layout_height="@dimen/item_margin"
+            android:layout_height="@dimen/text_margin"
             android:layout_gravity="center|center_horizontal|center_vertical"
             android:visibility="gone" />
     </FrameLayout>

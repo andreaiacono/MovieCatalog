@@ -47,9 +47,11 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         if (exception != null) {
             Log.d(LOG_TAG, exception.message, exception)
             longToast("An error occurred while executing $asyncTaskType: ${exception.message}")
-        } else
+        }
+        else
             when (asyncTaskType) {
                 AsyncTaskType.NAS_SCAN -> {
+                    val progressBar: ProgressBar = findViewById(R.id.indefiniteProgressBar)
                     val newMovies = (result as List<NasMovie>)
                         .map {
                             Movie(
@@ -67,13 +69,12 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                     }
                     else {
                         val movies = moviesCatalog.movies.toMutableList()
-                        Log.d(LOG_TAG, "Added movies: $newMovies")
+                        longToast("New movies found: ${newMovies.size}")
                         movies.addAll(newMovies)
                         moviesCatalog.movies = movies
                         moviesCatalog.updateGenres()
                         moviesCatalog.saveCatalog()
-                        val nasProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
-                        FileSystemImageLoaderTask(this, moviesCatalog, nasProgressBar).execute()
+                        FileSystemImageLoaderTask(this, moviesCatalog, progressBar).execute()
                     }
                 }
                 AsyncTaskType.FILE_SYSTEM_IMAGE_LOAD -> {
@@ -97,7 +98,6 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         config = loadConfig();
         moviesCatalog = MoviesCatalog(
@@ -127,8 +127,8 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             startActivity(fullScreenIntent)
         }
 
-        val nasProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
-        FileSystemImageLoaderTask(this, moviesCatalog, nasProgressBar).execute()
+        val fileSystemProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
+        FileSystemImageLoaderTask(this, moviesCatalog, fileSystemProgressBar).execute()
 
         if (moviesCatalog.hasNoData) {
             val builder = AlertDialog.Builder(this)
@@ -156,8 +156,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_scan -> {
                 val horizontalProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
-                val indefiniteProgressBar: ProgressBar = findViewById(R.id.indefiniteProgressBar)
-                NasScanningTask(this, moviesCatalog, horizontalProgressBar, indefiniteProgressBar).execute()
+                NasScanningTask(this, moviesCatalog, horizontalProgressBar).execute()
                 true
             }
             R.id.action_info -> {

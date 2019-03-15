@@ -4,76 +4,17 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import jcifs.smb.SmbFile
-import org.andreaiacono.moviecatalog.model.Movie
-import org.andreaiacono.moviecatalog.model.NasMovie
-import org.andreaiacono.moviecatalog.model.fromXml
-import org.andreaiacono.moviecatalog.util.MOVIE_EXTENSIONS
 import java.io.InputStream
 import java.io.Serializable
-import java.util.*
 
 class NasReader(val url: String) : Serializable {
 
     val LOG_TAG = this.javaClass.name
 
-    fun getMoviesDirectories(): List<String> {
+    fun getMoviesDirectories(): Array<SmbFile> {
 
         val moviesRoot = SmbFile(url)
-        return moviesRoot.listFiles().map { it.name }.toList()
-    }
-
-    fun getMovies(alreadyPresentNasMovies: List<Movie>): Pair<List<NasMovie>, List<String>> {
-
-        val existingMoviesDirs = alreadyPresentNasMovies.map { it.dirName }.toList()
-        val nasMovies: MutableList<NasMovie> = mutableListOf()
-        val notFoundMovies: MutableList<String> = mutableListOf()
-
-        val moviesRoot = SmbFile(url)
-        for (movieDir in moviesRoot.listFiles()) {
-
-            Log.d(LOG_TAG, "Reading file ${movieDir.name}")
-            if (movieDir.isDirectory && !existingMoviesDirs.contains(movieDir.name)) {
-                val xmlFiles = movieDir
-                    .listFiles()
-                    .filter { !it.name.startsWith(".") }
-                    .filter { it.name.toLowerCase().endsWith(".xml") }
-                    .toList()
-
-                val movieFiles = movieDir
-                    .listFiles()
-                    .filter { it.name.takeLast(3).toLowerCase() in MOVIE_EXTENSIONS }
-                    .toList()
-                if (movieFiles.size != 1) {
-                    Log.e(LOG_TAG, "Video files found: $movieFiles")
-                }
-
-                try {
-                    if (!xmlFiles.isEmpty()) {
-                        // assumes there's only one xml file in each dir
-                        Log.d(LOG_TAG, "xmlFiles: $xmlFiles")
-                        val xmlContent = xmlFiles[0].inputStream.readBytes().toString(Charsets.UTF_8)
-                        val xmlMovie = fromXml(xmlContent)
-                        nasMovies.add(
-                            NasMovie(
-                                xmlMovie.title,
-                                xmlMovie.sortingTitle ?: xmlMovie.title,
-                                if (xmlMovie.date.time > 0L) xmlMovie.date else Date(movieDir.date),
-                                xmlMovie.genres,
-                                movieDir.name,
-                                movieFiles[0].name
-                            )
-                        )
-                    }
-                    else {
-                        notFoundMovies.add(movieDir.name)
-                        Log.i(LOG_TAG, "Xml file not found in [$movieDir]")
-                    }
-                } catch (ex: Throwable) {
-                    Log.e(LOG_TAG, "Error occurred on $movieDir: ${ex.message}")
-                }
-            }
-        }
-        return Pair(nasMovies, notFoundMovies)
+        return moviesRoot.listFiles()
     }
 
     private fun getFullImage(dirName: String, filename: String): Bitmap {
