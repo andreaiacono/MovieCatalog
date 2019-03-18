@@ -20,10 +20,14 @@ internal class DuneHdCommanderTask(taskListener: PostTaskListener<Any>, val dune
 
     override fun doInBackground(vararg names: String): Void? {
         Log.d(LOG_TAG, "names: ${Arrays.toString(names)}")
-        val response = duneHdService.startMovie(names[0], names[1])
-        Log.i(LOG_TAG, "Dune call returned $response")
-        // if response is false, throws exception
-        result = "Movie ${names[0]} started"
+        try {
+            val response = duneHdService.startMovie(names[0], names[1])
+            Log.i(LOG_TAG, "Dune call returned $response")
+            result = "Movie ${names[0]} started"
+        }
+        catch (ex: Exception) {
+            result = "Movie not started: ${ex.message}"
+        }
         return null
     }
 
