@@ -2,7 +2,7 @@
 
 This is an android app I wrote for my own home theater system, which is composed by a NAS (accessible via SMB protocol) and a DuneHD player. 
 
-### ![App Screenshot](<https://raw.githubusercontent.com/andreaiacono/MovieCatalog/master/Screenshot_1552858291.png>)
+### ![App Screenshot](<https://raw.githubusercontent.com/andreaiacono/MovieCatalog/master/screenshot.png>)
 
 
 
