@@ -57,6 +57,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                         .map {
                             Movie(
                                 it.title,
+                                it.sortingTitle!!,
                                 it.date,
                                 it.dirName,
                                 it.videoFilename,

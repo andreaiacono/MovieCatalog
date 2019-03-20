@@ -82,7 +82,7 @@ class ImageAdapter(val context: Context, val movieBitmaps: List<MovieBitmap>) : 
 enum class MovieComparator : Comparator<MovieBitmap> {
     BY_TITLE_ASC {
         override fun compare(m1: MovieBitmap, m2: MovieBitmap): Int {
-            return m1.movie.title.compareTo(m2.movie.title)
+            return m1.movie.sortingTitle.compareTo(m2.movie.sortingTitle)
         }
     },
     BY_DATE_ASC {

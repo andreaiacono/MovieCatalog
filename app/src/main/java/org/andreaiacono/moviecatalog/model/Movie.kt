@@ -5,6 +5,7 @@ import java.util.*
 
 data class Movie (
     val title: String,
+    val sortingTitle: String,
     val date: Date,
     val dirName: String,
     val videoFileName: String,
@@ -12,4 +13,4 @@ data class Movie (
     val thumbName: String
 ) : Serializable
 
-val EMPTY_MOVIE = Movie("", Date(0L), "", thumbName = "", videoFileName = "")
+val EMPTY_MOVIE = Movie("", "",  Date(0L), "", thumbName = "", videoFileName = "")
