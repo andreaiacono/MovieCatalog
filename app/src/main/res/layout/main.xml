@@ -40,8 +40,7 @@
             android:id="@+id/moviesGridView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_toRightOf="@+id/genresListView"
-            android:numColumns="@integer/column_count" />
+            android:layout_toRightOf="@+id/genresListView" />
 
     </RelativeLayout>
 

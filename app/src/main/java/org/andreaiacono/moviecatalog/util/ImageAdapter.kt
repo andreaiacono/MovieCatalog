@@ -19,8 +19,7 @@ class ImageAdapter(val context: Context, val movieBitmaps: List<MovieBitmap>) : 
 
     val LOG_TAG = this.javaClass.name
     
-    val r = Resources.getSystem()
-    val pxWidth = (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 180f, r.getDisplayMetrics())).toInt()
+    val pxWidth = (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 160f, Resources.getSystem().displayMetrics)).toInt()
     val pxHeight = (pxWidth * 1.5).toInt()
     var comparator: MovieComparator = MovieComparator.BY_DATE_ASC
 

@@ -2,7 +2,6 @@ package org.andreaiacono.moviecatalog.activity
 
 import android.app.AlertDialog
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -29,6 +28,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import org.andreaiacono.moviecatalog.model.Config
 import android.app.ActivityManager
+
+
 
 class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
@@ -119,6 +120,12 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         }
 
         gridView = findViewById(R.id.moviesGridView)
+
+        val scalefactor = resources.displayMetrics.density * 180
+        val number = windowManager.defaultDisplay.width
+        val columns = (number.toFloat() / scalefactor).toInt()
+        gridView.numColumns = columns
+
         gridView.onItemClickListener = AdapterView.OnItemClickListener { _, v, position, _ ->
             val fullScreenIntent = Intent(v.context, MovieDetailActivity::class.java)
             fullScreenIntent.putExtra("movie", (imageAdapter.getItem(position) as MovieBitmap).movie)
