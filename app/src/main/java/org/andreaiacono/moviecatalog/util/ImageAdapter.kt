@@ -12,28 +12,7 @@ import org.andreaiacono.moviecatalog.core.ALL_GENRES
 import org.andreaiacono.moviecatalog.model.Movie
 import java.util.Comparator
 
-data class MovieBitmap(val movie: Movie, val bitmap: Bitmap) : Parcelable {
-
-    constructor(source: Parcel) : this(
-        source.readSerializable() as Movie,
-        source.readParcelable<Bitmap>(Bitmap::class.java.classLoader)
-    )
-
-    override fun describeContents() = 0
-
-    override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
-        writeSerializable(movie)
-        writeParcelable(bitmap, 0)
-    }
-
-    companion object {
-        @JvmField
-        val CREATOR: Parcelable.Creator<MovieBitmap> = object : Parcelable.Creator<MovieBitmap> {
-            override fun createFromParcel(source: Parcel): MovieBitmap = MovieBitmap(source)
-            override fun newArray(size: Int): Array<MovieBitmap?> = arrayOfNulls(size)
-        }
-    }
-}
+data class MovieBitmap(val movie: Movie, val bitmap: Bitmap)
 
 
 class ImageAdapter(val context: Context, val movieBitmaps: List<MovieBitmap>) : BaseAdapter() {
