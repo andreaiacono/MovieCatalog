@@ -28,8 +28,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import org.andreaiacono.moviecatalog.model.Config
 import android.app.ActivityManager
-
-
+import android.widget.Toast
+import android.widget.AdapterView
+import android.app.SearchManager
+import android.content.Context
 
 class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
@@ -40,8 +42,8 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
     private lateinit var genresListView: ListView
     private lateinit var moviesCatalog: MoviesCatalog
     private lateinit var movieBitmaps: ArrayList<MovieBitmap>
-    private lateinit var imageAdapter: ImageAdapter
     private lateinit var genresAdapter: ArrayAdapter<String>
+    private var imageAdapter: ImageAdapter = ImageAdapter(this, listOf())
 
     override fun onPostTask(result: Any, asyncTaskType: AsyncTaskType, exception: Exception?) {
 
@@ -62,7 +64,8 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                                 it.dirName,
                                 it.videoFilename,
                                 it.genres,
-                                thumbNameNormalizer(it.title)
+                                thumbNameNormalizer(it.title),
+                                getInfoFromNasMovie(it)
                             )
                         }
                         .toList()
@@ -96,6 +99,9 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             }
     }
 
+    private fun getInfoFromNasMovie(movie: NasMovie) =
+        movie.title + " " + movie.director + " " + movie.cast.joinToString { " " } + movie.year
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -122,9 +128,9 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
         gridView = findViewById(R.id.moviesGridView)
 
-        val scalefactor = resources.displayMetrics.density * 180
+        val scaleFactor = resources.displayMetrics.density * 180
         val number = windowManager.defaultDisplay.width
-        val columns = (number.toFloat() / scalefactor).toInt()
+        val columns = (number.toFloat() / scaleFactor).toInt()
         gridView.numColumns = columns
 
         gridView.onItemClickListener = AdapterView.OnItemClickListener { _, v, position, _ ->
@@ -147,6 +153,11 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             val messageView = dialog.findViewById<View>(android.R.id.message) as TextView
             messageView.gravity = Gravity.CENTER
         }
+
+        // Verify the action and get the query
+        if (Intent.ACTION_SEARCH == intent.action) {
+            intent.getStringExtra(SearchManager.QUERY)?.also { imageAdapter.search(it) }
+        }
     }
 
     fun loadConfig(): Config {
@@ -156,12 +167,24 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
+
+        // Get the SearchView and set the searchable configuration
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        (menu.findItem(R.id.action_search).actionView as SearchView).apply {
+            // Assumes current activity is the searchable activity
+            setSearchableInfo(searchManager.getSearchableInfo(componentName))
+            setIconifiedByDefault(false) // Do not iconify the widget; expand it by default
+        }
+
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         return when (item.itemId) {
+            R.id.action_search -> {
+               true
+            }
             R.id.action_scan -> {
                 val horizontalProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
                 NasScanningTask(this, moviesCatalog, horizontalProgressBar).execute()

@@ -22,16 +22,7 @@ class ImageAdapter(val context: Context, val movieBitmaps: List<MovieBitmap>) : 
     val pxWidth = (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 160f, Resources.getSystem().displayMetrics)).toInt()
     val pxHeight = (pxWidth * 1.5).toInt()
     var comparator: MovieComparator = MovieComparator.BY_DATE_ASC
-
     var filteredBitmaps: List<MovieBitmap> = movieBitmaps.toMutableList()
-
-    fun filterByGenre(genreFilter: String) {
-        filteredBitmaps = if (genreFilter == ALL_GENRES) {
-            movieBitmaps.toList()
-        } else {
-            movieBitmaps.filter { it.movie.genres.contains(genreFilter) }.toList()
-        }
-    }
 
     override fun getCount(): Int = filteredBitmaps.size
 
@@ -55,6 +46,15 @@ class ImageAdapter(val context: Context, val movieBitmaps: List<MovieBitmap>) : 
         return imageView
     }
 
+    fun filterByGenre(genreFilter: String) {
+        filteredBitmaps = if (genreFilter == ALL_GENRES) {
+            movieBitmaps.toList()
+        }
+        else {
+            movieBitmaps.filter { it.movie.genres.contains(genreFilter) }.toList()
+        }
+    }
+
     fun setTitleComparator() {
         comparator = if (comparator === MovieComparator.BY_TITLE_ASC) {
             MovieComparator.BY_TITLE_DESC
@@ -75,6 +75,10 @@ class ImageAdapter(val context: Context, val movieBitmaps: List<MovieBitmap>) : 
         }
         // in place sort
         java.util.Collections.sort(filteredBitmaps, comparator)
+    }
+
+    fun search(s: String) {
+        filteredBitmaps = movieBitmaps.filter { it.movie.searchableInfo.contains(s) }.toList()
     }
 }
 

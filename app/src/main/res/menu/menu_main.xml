@@ -4,9 +4,17 @@
     tools:context="org.andreaiacono.moviecatalog.activity.MainActivity">
 
     <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search"
+        android:orderInCategory="10"
+        android:title="@string/action_search"
+        app:showAsAction="ifRoom"
+        app:actionViewClass="android.widget.SearchView" />
+
+    <item
         android:id="@+id/action_sort"
         android:icon="@drawable/ic_sort"
-        android:orderInCategory="10"
+        android:orderInCategory="50"
         android:title="@string/action_sort"
         app:showAsAction="ifRoom">
         <menu>

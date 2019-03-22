@@ -43,6 +43,15 @@ data class NasMovie (
     @JacksonXmlElementWrapper(localName = "genres")
     val genres: List<String> = listOf(),
 
+    @JacksonXmlElementWrapper(localName = "cast")
+    val cast: List<String> = listOf(),
+
+    @JacksonXmlProperty(localName = "director")
+    val director: String,
+
+    @JacksonXmlProperty(localName = "year")
+    val year: Integer,
+
     val dirName: String = "",
     val videoFilename: String = ""
 )

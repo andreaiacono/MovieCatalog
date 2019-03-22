@@ -11,4 +11,6 @@
     <string name="action_sort">Sort</string>
     <string name="sort_by_title">Sort by Title</string>
     <string name="sort_by_date">Sort by Date</string>
+    <string name="action_search">Search</string>
+    <string name="search_hint">Search titles, actors…</string>
 </resources>

@@ -89,6 +89,9 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
                                     xmlMovie.sortingTitle ?: xmlMovie.title,
                                     if (xmlMovie.date.time > 0L) xmlMovie.date else Date(movieDir.listFiles("folder.jpg").first().date),
                                     xmlMovie.genres,
+                                    xmlMovie.cast,
+                                    xmlMovie.director,
+                                    xmlMovie.year,
                                     movieDir.name,
                                     movieFiles[0].name
                                 )
