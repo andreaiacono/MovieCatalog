@@ -8,7 +8,7 @@ import org.andreaiacono.moviecatalog.ui.AsyncTaskType
 import org.andreaiacono.moviecatalog.ui.PostTaskListener
 
 internal class NasImageLoaderTask(taskListener: PostTaskListener<Any>, val nasService: NasService, val movieDir: String) :
-    AsyncTask<String, Integer, Void>() {
+    AsyncTask<String, Int, Void>() {
 
     val asyncTaskType = AsyncTaskType.NAS_IMAGE_LOAD
 

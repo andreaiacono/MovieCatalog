@@ -12,7 +12,7 @@ import org.andreaiacono.moviecatalog.ui.AsyncTaskType
 import org.andreaiacono.moviecatalog.ui.PostTaskListener
 import org.andreaiacono.moviecatalog.util.MovieBitmap
 
-internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, val moviesCatalog: MoviesCatalog, val progressBar: ProgressBar) : AsyncTask<String, Integer, Void>() {
+internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, val moviesCatalog: MoviesCatalog, val progressBar: ProgressBar) : AsyncTask<String, Int, Void>() {
 
     private val syncTaskType: AsyncTaskType = AsyncTaskType.FILE_SYSTEM_IMAGE_LOAD
 
@@ -33,7 +33,7 @@ internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, va
             try {
                 val filename = "${moviesCatalog.context.filesDir}/${movie.thumbName}"
                 movieBitmaps.add(MovieBitmap(movie, BitmapFactory.decodeFile(filename)))
-                publishProgress(index as Integer)
+                publishProgress(index)
             }
             catch (e: Exception) {
                 this.exception = e
@@ -46,7 +46,7 @@ internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, va
         return null
     }
 
-    override fun onProgressUpdate(vararg values: Integer?) {
+    override fun onProgressUpdate(vararg values: Int?) {
         super.onProgressUpdate(values[0])
         progressBar.progress = values[0]!!.toInt()
     }
