@@ -41,7 +41,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
     private lateinit var moviesCatalog: MoviesCatalog
     private lateinit var movieBitmaps: ArrayList<MovieBitmap>
     private lateinit var genresAdapter: ArrayAdapter<String>
-    private lateinit var imageAdapter: ImageAdapter // = ImageAdapter(this, listOf())
+    private lateinit var imageAdapter: ImageAdapter
 
     override fun onPostTask(result: Any, asyncTaskType: AsyncTaskType, exception: Exception?) {
 
@@ -102,6 +102,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                                                        movie.cast.joinToString { it } + " " +
                                                        movie.year
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -120,9 +121,10 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         genresListView = findViewById(R.id.genresListView)
         genresAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, moviesCatalog.genres)
         genresListView.adapter = genresAdapter
-
+        genresListView.choiceMode = ListView.CHOICE_MODE_SINGLE
+        genresListView.setSelector(R.color.darkMenuBackground)
         genresListView.onItemClickListener = AdapterView.OnItemClickListener { _, _, i, _ ->
-            imageAdapter.filterByGenre(genresListView.getAdapter().getItem(i).toString())
+            imageAdapter.filterByGenre(genresListView.adapter.getItem(i).toString())
         }
 
         gridView = findViewById(R.id.moviesGridView)
