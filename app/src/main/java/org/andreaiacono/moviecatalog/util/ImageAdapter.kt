@@ -3,8 +3,6 @@ package org.andreaiacono.moviecatalog.util
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
-import android.os.Parcel
-import android.os.Parcelable
 import android.util.TypedValue
 import android.widget.*
 import android.view.*
@@ -18,7 +16,7 @@ data class MovieBitmap(val movie: Movie, val bitmap: Bitmap)
 class ImageAdapter(val context: Context, val movieBitmaps: List<MovieBitmap>) : BaseAdapter() {
 
     val LOG_TAG = this.javaClass.name
-    
+
     val pxWidth = (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 160f, Resources.getSystem().displayMetrics)).toInt()
     val pxHeight = (pxWidth * 1.5).toInt()
     var comparator: MovieComparator = MovieComparator.BY_DATE_ASC
@@ -53,6 +51,8 @@ class ImageAdapter(val context: Context, val movieBitmaps: List<MovieBitmap>) : 
         else {
             movieBitmaps.filter { it.movie.genres.contains(genreFilter) }.toList()
         }
+        sort()
+        notifyDataSetChanged()
     }
 
     fun setTitleComparator() {
@@ -62,8 +62,8 @@ class ImageAdapter(val context: Context, val movieBitmaps: List<MovieBitmap>) : 
         else {
             MovieComparator.BY_TITLE_ASC
         }
-        // in place sort
-        java.util.Collections.sort(filteredBitmaps, comparator)
+        sort()
+        notifyDataSetChanged()
     }
 
     fun setDateComparator() {
@@ -73,13 +73,17 @@ class ImageAdapter(val context: Context, val movieBitmaps: List<MovieBitmap>) : 
         else {
             MovieComparator.BY_DATE_ASC
         }
-        // in place sort
-        java.util.Collections.sort(filteredBitmaps, comparator)
+        sort()
+        notifyDataSetChanged()
     }
 
     fun search(s: String) {
-        filteredBitmaps = movieBitmaps.filter { it.movie.searchableInfo.contains(s) }.toList()
+        filteredBitmaps = movieBitmaps.filter { it.movie.searchableInfo.toLowerCase().contains(s.toLowerCase()) }.toMutableList()
+        sort()
+        notifyDataSetChanged()
     }
+
+    private fun sort() = java.util.Collections.sort(filteredBitmaps, comparator)
 }
 
 

@@ -47,10 +47,10 @@ data class NasMovie (
     val cast: List<String> = listOf(),
 
     @JacksonXmlProperty(localName = "director")
-    val director: String,
+    val directors: List<String> = listOf(),
 
     @JacksonXmlProperty(localName = "year")
-    val year: Integer,
+    val year: Int,
 
     val dirName: String = "",
     val videoFilename: String = ""

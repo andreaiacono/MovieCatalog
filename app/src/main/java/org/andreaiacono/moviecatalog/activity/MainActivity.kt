@@ -30,8 +30,6 @@ import org.andreaiacono.moviecatalog.model.Config
 import android.app.ActivityManager
 import android.widget.Toast
 import android.widget.AdapterView
-import android.app.SearchManager
-import android.content.Context
 
 class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
@@ -43,7 +41,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
     private lateinit var moviesCatalog: MoviesCatalog
     private lateinit var movieBitmaps: ArrayList<MovieBitmap>
     private lateinit var genresAdapter: ArrayAdapter<String>
-    private var imageAdapter: ImageAdapter = ImageAdapter(this, listOf())
+    private lateinit var imageAdapter: ImageAdapter // = ImageAdapter(this, listOf())
 
     override fun onPostTask(result: Any, asyncTaskType: AsyncTaskType, exception: Exception?) {
 
@@ -99,8 +97,10 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             }
     }
 
-    private fun getInfoFromNasMovie(movie: NasMovie) =
-        movie.title + " " + movie.director + " " + movie.cast.joinToString { " " } + movie.year
+    private fun getInfoFromNasMovie(movie: NasMovie) = movie.title + " " +
+                                                       movie.directors.joinToString { it } + " " +
+                                                       movie.cast.joinToString { it } + " " +
+                                                       movie.year
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -123,7 +123,6 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
         genresListView.onItemClickListener = AdapterView.OnItemClickListener { _, _, i, _ ->
             imageAdapter.filterByGenre(genresListView.getAdapter().getItem(i).toString())
-            imageAdapter.notifyDataSetChanged()
         }
 
         gridView = findViewById(R.id.moviesGridView)
@@ -153,11 +152,6 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             val messageView = dialog.findViewById<View>(android.R.id.message) as TextView
             messageView.gravity = Gravity.CENTER
         }
-
-        // Verify the action and get the query
-        if (Intent.ACTION_SEARCH == intent.action) {
-            intent.getStringExtra(SearchManager.QUERY)?.also { imageAdapter.search(it) }
-        }
     }
 
     fun loadConfig(): Config {
@@ -168,13 +162,19 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
 
-        // Get the SearchView and set the searchable configuration
-        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        (menu.findItem(R.id.action_search).actionView as SearchView).apply {
-            // Assumes current activity is the searchable activity
-            setSearchableInfo(searchManager.getSearchableInfo(componentName))
-            setIconifiedByDefault(false) // Do not iconify the widget; expand it by default
-        }
+        val searchView = menu.findItem(R.id.action_search).actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+
+            override fun onQueryTextSubmit(s: String): Boolean {
+                imageAdapter.search(s)
+                return false
+            }
+
+            override fun onQueryTextChange(s: String): Boolean {
+                imageAdapter.search(s)
+                return false
+            }
+        })
 
         return true
     }
@@ -182,9 +182,6 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         return when (item.itemId) {
-            R.id.action_search -> {
-               true
-            }
             R.id.action_scan -> {
                 val horizontalProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
                 NasScanningTask(this, moviesCatalog, horizontalProgressBar).execute()
@@ -202,6 +199,9 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             }
             R.id.action_delete -> {
                 moviesCatalog.deleteAll()
+                moviesCatalog = MoviesCatalog(applicationContext, config.nasUrl, config.duneIp)
+//                imageAdapter = ImageAdapter(applicationContext, listOf())
+//                imageAdapter.notifyDataSetChanged()
                 shortToast("All files deleted")
                 true
             }
@@ -225,12 +225,10 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             }
             R.id.menuSortByTitle -> {
                 imageAdapter.setTitleComparator()
-                imageAdapter.notifyDataSetChanged()
                 true
             }
             R.id.menuSortByDate -> {
                 imageAdapter.setDateComparator()
-                imageAdapter.notifyDataSetChanged()
                 true
             }
             else -> super.onOptionsItemSelected(item)

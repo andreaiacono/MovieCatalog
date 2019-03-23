@@ -15,7 +15,7 @@ import org.andreaiacono.moviecatalog.util.thumbNameNormalizer
 import java.util.*
 
 internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCatalog: MoviesCatalog, val horizontalProgressBar: ProgressBar) :
-    AsyncTask<String, Integer, Void>() {
+    AsyncTask<String, Int, Void>() {
 
     val asyncTaskType = AsyncTaskType.NAS_SCAN
 
@@ -59,7 +59,7 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
         try {
             movieDirs.forEachIndexed { index, movieDir ->
 
-                publishProgress(index as Integer)
+                publishProgress(index)
                 Log.d(LOG_TAG, "Reading file ${movieDir.name}")
                 if (movieDir.isDirectory && !existingDirNames.contains(movieDir.name)) {
                     val xmlFiles = movieDir
@@ -90,13 +90,12 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
                                     if (xmlMovie.date.time > 0L) xmlMovie.date else Date(movieDir.listFiles("folder.jpg").first().date),
                                     xmlMovie.genres,
                                     xmlMovie.cast,
-                                    xmlMovie.director,
+                                    xmlMovie.directors,
                                     xmlMovie.year,
                                     movieDir.name,
                                     movieFiles[0].name
                                 )
                             )
-
                             val thumbFilename = thumbNameNormalizer(xmlMovie.title)
                             Log.d(LOG_TAG, "Saving $thumbFilename (dirName=${movieDir.name})")
                             moviesCatalog.saveBitmap(
@@ -118,7 +117,7 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
         return null
     }
 
-    override fun onProgressUpdate(vararg values: Integer?) {
+    override fun onProgressUpdate(vararg values: Int?) {
         super.onProgressUpdate(values[0])
         horizontalProgressBar.progress = values[0]!!.toInt()
     }
