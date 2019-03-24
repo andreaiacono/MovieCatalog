@@ -25,10 +25,10 @@ import android.widget.TextView
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import org.andreaiacono.moviecatalog.model.Config
-import android.app.ActivityManager
 import android.widget.Toast
 import android.widget.AdapterView
 import org.andreaiacono.moviecatalog.util.computeColumns
+import org.andreaiacono.moviecatalog.util.getDebugInfo
 
 class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
@@ -179,21 +179,10 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                 true
             }
             R.id.action_debugInfo -> {
-                val sendIntent: Intent = Intent().apply {
-                    val activityManager = applicationContext.getSystemService(ACTIVITY_SERVICE) as ActivityManager
-                    val memoryInfo = ActivityManager.MemoryInfo()
-                    activityManager.getMemoryInfo(memoryInfo)
-
-                    action = Intent.ACTION_SEND
-                    val files =
-                        "Config: $config\n\nMemory info: ${memoryInfo.lowMemory}\n\nPrivate directory content: \n${filesDir.list().map { "[$it]" }.joinToString(
-                            "\n"
-                        )}"
-                    putExtra(Intent.EXTRA_TEXT, files)
-                    type = "text/plain"
-                    Log.d(LOG_TAG, files)
-                }
-                startActivity(sendIntent)
+                val builder = AlertDialog.Builder(this)
+                val title = builder.setMessage(getDebugInfo(config, this.filesDir)).setTitle(R.string.info_title)
+                val dialog = builder.create()
+                dialog.show()
                 true
             }
             R.id.menuSortByTitle -> {
