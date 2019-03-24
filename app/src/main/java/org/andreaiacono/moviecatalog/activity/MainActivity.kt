@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -136,6 +137,10 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         menuInflater.inflate(R.menu.menu_main, menu)
 
         val searchView = menu.findItem(R.id.action_search).actionView as SearchView
+        val searchImgId = android.support.v7.appcompat.R.id.search_button
+        val v = searchView.findViewById(searchImgId) as ImageView
+        v.setImageResource(R.drawable.ic_search)
+
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextSubmit(s: String): Boolean {
