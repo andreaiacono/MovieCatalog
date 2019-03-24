@@ -10,16 +10,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
 import org.andreaiacono.moviecatalog.R
-import org.andreaiacono.moviecatalog.activity.task.FileSystemImageLoaderTask
-import org.andreaiacono.moviecatalog.activity.task.NasScanningTask
-import org.andreaiacono.moviecatalog.core.MoviesCatalog
-import org.andreaiacono.moviecatalog.model.Movie
+import org.andreaiacono.moviecatalog.task.DeviceImageLoaderTask
+import org.andreaiacono.moviecatalog.task.NasScanningTask
+import org.andreaiacono.moviecatalog.service.MoviesCatalog
 import org.andreaiacono.moviecatalog.model.NasMovie
-import org.andreaiacono.moviecatalog.ui.AsyncTaskType
-import org.andreaiacono.moviecatalog.ui.PostTaskListener
+import org.andreaiacono.moviecatalog.task.AsyncTaskType
+import org.andreaiacono.moviecatalog.task.PostTaskListener
 import org.andreaiacono.moviecatalog.util.ImageAdapter
 import org.andreaiacono.moviecatalog.util.MovieBitmap
-import org.andreaiacono.moviecatalog.util.thumbNameNormalizer
 import java.io.Serializable
 import android.view.Gravity
 import android.view.View
@@ -30,6 +28,7 @@ import org.andreaiacono.moviecatalog.model.Config
 import android.app.ActivityManager
 import android.widget.Toast
 import android.widget.AdapterView
+import org.andreaiacono.moviecatalog.util.computeColumns
 
 class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
@@ -52,32 +51,15 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         else
             when (asyncTaskType) {
                 AsyncTaskType.NAS_SCAN -> {
-                    val progressBar: ProgressBar = findViewById(R.id.indefiniteProgressBar)
-                    val newMovies = (result as List<NasMovie>)
-                        .map {
-                            Movie(
-                                it.title,
-                                it.sortingTitle!!,
-                                it.date,
-                                it.dirName,
-                                it.videoFilename,
-                                it.genres,
-                                thumbNameNormalizer(it.title),
-                                getInfoFromNasMovie(it)
-                            )
-                        }
-                        .toList()
-                    if (newMovies.isEmpty()) {
-                        shortToast("No new movies found")
+
+                    val newMoviesCount = moviesCatalog.saveNewMoviesOnDevice(result as List<NasMovie>)
+                    if (newMoviesCount > 0) {
+                        longToast("New movies found: $newMoviesCount")
+                        val progressBar: ProgressBar = findViewById(R.id.indefiniteProgressBar)
+                        DeviceImageLoaderTask(this, moviesCatalog, progressBar).execute()
                     }
                     else {
-                        val movies = moviesCatalog.movies.toMutableList()
-                        longToast("New movies found: ${newMovies.size}")
-                        movies.addAll(newMovies)
-                        moviesCatalog.movies = movies
-                        moviesCatalog.updateGenres()
-                        moviesCatalog.saveCatalog()
-                        FileSystemImageLoaderTask(this, moviesCatalog, progressBar).execute()
+                        shortToast("No new movies found")
                     }
                 }
                 AsyncTaskType.FILE_SYSTEM_IMAGE_LOAD -> {
@@ -86,7 +68,6 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                         imageAdapter = ImageAdapter(this, movieBitmaps)
                         imageAdapter.setDateComparator()
                         gridView.adapter = imageAdapter
-                        genresAdapter.notifyDataSetChanged()
                     }
                 }
                 AsyncTaskType.DUNE_HD_COMMANDER -> {
@@ -96,12 +77,6 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                 }
             }
     }
-
-    private fun getInfoFromNasMovie(movie: NasMovie) = movie.title + " " +
-                                                       movie.directors.joinToString { it } + " " +
-                                                       movie.cast.joinToString { it } + " " +
-                                                       movie.year
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -128,11 +103,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         }
 
         gridView = findViewById(R.id.moviesGridView)
-
-        val scaleFactor = resources.displayMetrics.density * 180
-        val number = windowManager.defaultDisplay.width
-        val columns = (number.toFloat() / scaleFactor).toInt()
-        gridView.numColumns = columns
+        gridView.numColumns = computeColumns(resources, windowManager)
 
         gridView.onItemClickListener = AdapterView.OnItemClickListener { _, v, position, _ ->
             val fullScreenIntent = Intent(v.context, MovieDetailActivity::class.java)
@@ -143,7 +114,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         }
 
         val fileSystemProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
-        FileSystemImageLoaderTask(this, moviesCatalog, fileSystemProgressBar).execute()
+        DeviceImageLoaderTask(this, moviesCatalog, fileSystemProgressBar).execute()
 
         if (moviesCatalog.hasNoData) {
             val builder = AlertDialog.Builder(this)
@@ -201,9 +172,9 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             }
             R.id.action_delete -> {
                 moviesCatalog.deleteAll()
-                moviesCatalog = MoviesCatalog(applicationContext, config.nasUrl, config.duneIp)
-//                imageAdapter = ImageAdapter(applicationContext, listOf())
-//                imageAdapter.notifyDataSetChanged()
+                imageAdapter.deleteAll()
+                genresAdapter.notifyDataSetChanged()
+                imageAdapter.notifyDataSetChanged()
                 shortToast("All files deleted")
                 true
             }

@@ -1,18 +1,32 @@
 package org.andreaiacono.moviecatalog.service
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Log
 import jcifs.smb.SmbFile
-import org.andreaiacono.moviecatalog.network.NasReader
+import java.io.InputStream
 import java.io.Serializable
 
 
-class NasService(url: String) : Serializable {
+class NasService(val url: String) : Serializable {
 
-    private val nasReader = NasReader(url)
+    val LOG_TAG = this.javaClass.name
 
-    fun getMoviesDirectories(): Array<SmbFile> = nasReader.getMoviesDirectories()
+    fun getMoviesDirectories(): Array<SmbFile> {
+        val moviesRoot = SmbFile(url)
+        return moviesRoot.listFiles()
+    }
 
-    fun getThumbnail(movieDir: String) = nasReader.getThumb(movieDir)
+    private fun getFullImage(dirName: String, filename: String): Bitmap {
+        val fullName = "$url$dirName$filename"
+        Log.d(LOG_TAG, "Loading image $fullName")
+        return urlImageToBitmap(SmbFile(fullName).inputStream)
+    }
 
-    fun getFullImage(movieDir: String) = nasReader.getFullImage(movieDir)
+    fun getThumbnail(dirName: String): Bitmap = getFullImage(dirName, "folder.jpg")
+
+    fun getFullImage(dirName: String): Bitmap = getFullImage(dirName, "about.jpg")
+
+    private fun urlImageToBitmap(imageStream: InputStream): Bitmap = BitmapFactory.decodeStream(imageStream)
 }
 

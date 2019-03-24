@@ -11,13 +11,13 @@ import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.Toast
 import org.andreaiacono.moviecatalog.R
-import org.andreaiacono.moviecatalog.activity.task.DuneHdCommanderTask
-import org.andreaiacono.moviecatalog.activity.task.NasImageLoaderTask
+import org.andreaiacono.moviecatalog.task.DuneHdCommanderTask
+import org.andreaiacono.moviecatalog.task.NasImageLoaderTask
 import org.andreaiacono.moviecatalog.model.Movie
 import org.andreaiacono.moviecatalog.service.DuneHdService
 import org.andreaiacono.moviecatalog.service.NasService
-import org.andreaiacono.moviecatalog.ui.AsyncTaskType
-import org.andreaiacono.moviecatalog.ui.PostTaskListener
+import org.andreaiacono.moviecatalog.task.AsyncTaskType
+import org.andreaiacono.moviecatalog.task.PostTaskListener
 
 class MovieDetailActivity : PostTaskListener<Any>, AppCompatActivity() {
 

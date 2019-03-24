@@ -1,4 +1,4 @@
-package org.andreaiacono.moviecatalog.activity.task
+package org.andreaiacono.moviecatalog.task
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -6,13 +6,11 @@ import android.os.AsyncTask
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
-import org.andreaiacono.moviecatalog.core.MoviesCatalog
+import org.andreaiacono.moviecatalog.service.MoviesCatalog
 import org.andreaiacono.moviecatalog.model.EMPTY_MOVIE
-import org.andreaiacono.moviecatalog.ui.AsyncTaskType
-import org.andreaiacono.moviecatalog.ui.PostTaskListener
 import org.andreaiacono.moviecatalog.util.MovieBitmap
 
-internal class FileSystemImageLoaderTask(taskListener: PostTaskListener<Any>, val moviesCatalog: MoviesCatalog, val progressBar: ProgressBar) : AsyncTask<String, Int, Void>() {
+internal class DeviceImageLoaderTask(taskListener: PostTaskListener<Any>, val moviesCatalog: MoviesCatalog, val progressBar: ProgressBar) : AsyncTask<String, Int, Void>() {
 
     private val syncTaskType: AsyncTaskType = AsyncTaskType.FILE_SYSTEM_IMAGE_LOAD
 

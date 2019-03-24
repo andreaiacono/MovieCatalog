@@ -1,11 +1,9 @@
-package org.andreaiacono.moviecatalog.activity.task
+package org.andreaiacono.moviecatalog.task
 
 import android.graphics.Bitmap
 import android.os.AsyncTask
 import android.util.Log
 import org.andreaiacono.moviecatalog.service.NasService
-import org.andreaiacono.moviecatalog.ui.AsyncTaskType
-import org.andreaiacono.moviecatalog.ui.PostTaskListener
 
 internal class NasImageLoaderTask(taskListener: PostTaskListener<Any>, val nasService: NasService, val movieDir: String) :
     AsyncTask<String, Int, Void>() {

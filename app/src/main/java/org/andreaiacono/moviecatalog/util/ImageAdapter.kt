@@ -6,14 +6,14 @@ import android.graphics.Bitmap
 import android.util.TypedValue
 import android.widget.*
 import android.view.*
-import org.andreaiacono.moviecatalog.core.ALL_GENRES
+import org.andreaiacono.moviecatalog.service.ALL_GENRES
 import org.andreaiacono.moviecatalog.model.Movie
 import java.util.Comparator
 
 data class MovieBitmap(val movie: Movie, val bitmap: Bitmap)
 
 
-class ImageAdapter(val context: Context, val movieBitmaps: List<MovieBitmap>) : BaseAdapter() {
+class ImageAdapter(val context: Context, val movieBitmaps: MutableList<MovieBitmap>) : BaseAdapter() {
 
     val LOG_TAG = this.javaClass.name
 
@@ -84,6 +84,11 @@ class ImageAdapter(val context: Context, val movieBitmaps: List<MovieBitmap>) : 
     }
 
     private fun sort() = java.util.Collections.sort(filteredBitmaps, comparator)
+
+    fun deleteAll() {
+        movieBitmaps.clear()
+        filteredBitmaps = listOf()
+    }
 }
 
 

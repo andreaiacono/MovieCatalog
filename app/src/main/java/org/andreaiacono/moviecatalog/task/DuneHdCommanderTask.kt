@@ -1,10 +1,8 @@
-package org.andreaiacono.moviecatalog.activity.task
+package org.andreaiacono.moviecatalog.task
 
 import android.os.AsyncTask
 import android.util.Log
 import org.andreaiacono.moviecatalog.service.DuneHdService
-import org.andreaiacono.moviecatalog.ui.AsyncTaskType
-import org.andreaiacono.moviecatalog.ui.PostTaskListener
 import java.util.*
 
 internal class DuneHdCommanderTask(taskListener: PostTaskListener<Any>, val duneHdService: DuneHdService) :

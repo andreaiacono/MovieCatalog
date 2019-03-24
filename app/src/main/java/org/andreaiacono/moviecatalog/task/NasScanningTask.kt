@@ -1,13 +1,11 @@
-package org.andreaiacono.moviecatalog.activity.task
+package org.andreaiacono.moviecatalog.task
 
 import android.os.AsyncTask
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import jcifs.smb.SmbFile
-import org.andreaiacono.moviecatalog.core.MoviesCatalog
-import org.andreaiacono.moviecatalog.ui.AsyncTaskType
-import org.andreaiacono.moviecatalog.ui.PostTaskListener
+import org.andreaiacono.moviecatalog.service.MoviesCatalog
 import org.andreaiacono.moviecatalog.model.NasMovie
 import org.andreaiacono.moviecatalog.model.fromXml
 import org.andreaiacono.moviecatalog.util.MOVIE_EXTENSIONS

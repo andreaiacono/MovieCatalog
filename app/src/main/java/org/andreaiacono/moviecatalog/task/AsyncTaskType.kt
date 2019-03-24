@@ -1,4 +1,4 @@
-package org.andreaiacono.moviecatalog.ui
+package org.andreaiacono.moviecatalog.task
 
 enum class AsyncTaskType {
     NAS_IMAGE_LOAD,
