@@ -97,8 +97,6 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         genresListView = findViewById(R.id.genresListView)
         genresAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, moviesCatalog.genres)
         genresListView.adapter = genresAdapter
-        genresListView.choiceMode = ListView.CHOICE_MODE_SINGLE
-        genresListView.setSelector(R.color.darkMenuBackground)
         genresListView.onItemClickListener = AdapterView.OnItemClickListener { _, _, i, _ ->
             imageAdapter.filterByGenre(genresListView.adapter.getItem(i).toString())
         }

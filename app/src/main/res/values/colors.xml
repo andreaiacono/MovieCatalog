@@ -2,6 +2,7 @@
 <resources>
     <color name="lightForeground">#C0F0C0</color>
     <color name="darkBackground">#202020</color>
+    <color name="selectedGenre">#101010</color>
     <color name="darkMenuBackground">#191919</color>
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
