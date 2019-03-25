@@ -30,6 +30,8 @@ import android.widget.Toast
 import android.widget.AdapterView
 import org.andreaiacono.moviecatalog.util.computeColumns
 import org.andreaiacono.moviecatalog.util.getDebugInfo
+import android.widget.ArrayAdapter
+
 
 class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
 
@@ -126,32 +128,36 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         }
     }
 
-    fun loadConfig(): Config {
-        val mapper = ObjectMapper(YAMLFactory())
-        return mapper.readValue(resources.openRawResource(R.raw.config), Config::class.java)
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
 
         val searchView = menu.findItem(R.id.action_search).actionView as SearchView
+
+        // changes default icon
         val searchImgId = android.support.v7.appcompat.R.id.search_button
         val v = searchView.findViewById(searchImgId) as ImageView
         v.setImageResource(R.drawable.ic_search)
 
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        // sets search autocompletion
+        val searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text) as SearchView.SearchAutoComplete
+        val suggestionsAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, moviesCatalog.getSearchSuggestions())
+        searchAutoComplete.setAdapter(suggestionsAdapter)
+        searchAutoComplete.onItemClickListener =
+            AdapterView.OnItemClickListener { adapterView, _, itemIndex, _ ->
+                val queryString = adapterView.getItemAtPosition(itemIndex) as String
+                searchAutoComplete.setText("" + queryString)
+            }
 
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(s: String): Boolean {
                 imageAdapter.search(s)
                 return false
             }
-
             override fun onQueryTextChange(s: String): Boolean {
                 imageAdapter.search(s)
                 return false
             }
         })
-
         return true
     }
 
@@ -198,6 +204,11 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    fun loadConfig(): Config {
+        val mapper = ObjectMapper(YAMLFactory())
+        return mapper.readValue(resources.openRawResource(R.raw.config), Config::class.java)
     }
 
     private fun shortToast(message: String) {

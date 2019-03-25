@@ -40,7 +40,7 @@ class NasServiceTest {
 
 //        val movie = NasService("", "", "").getAllTitles(xmlContent, "fooDir")
 //        assertEquals("300", movie.title)
-//        assertEquals("fooDir", movie.dirName)
+//        assertEquals("fooDir", movie.nasDirName)
 //        assertEquals("06/09/2013", SimpleDateFormat("dd/MM/yyyy").format(movie.date))
     }
 

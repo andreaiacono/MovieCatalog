@@ -66,7 +66,7 @@ class MovieDetailActivity : PostTaskListener<Any>, AppCompatActivity() {
         movie = intent.extras.get("movie") as Movie
         val nasService = intent.extras.get("NasService") as NasService
         duneHdService = intent.extras.get("DuneHdService") as DuneHdService
-        NasImageLoaderTask(this, nasService, movie.dirName).execute()
+        NasImageLoaderTask(this, nasService, movie.nasDirName).execute()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -87,7 +87,7 @@ class MovieDetailActivity : PostTaskListener<Any>, AppCompatActivity() {
                 true
             }
             R.id.action_play -> {
-                DuneHdCommanderTask(this, duneHdService).execute(movie.dirName, movie.videoFileName)
+                DuneHdCommanderTask(this, duneHdService).execute(movie.nasDirName, movie.nasVideoFileName)
                 true
             }
             else -> super.onOptionsItemSelected(item)

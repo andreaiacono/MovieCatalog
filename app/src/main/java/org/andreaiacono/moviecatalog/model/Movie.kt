@@ -7,11 +7,12 @@ data class Movie (
     val title: String,
     val sortingTitle: String,
     val date: Date,
-    val dirName: String,
-    val videoFileName: String,
+    val deviceThumbName: String,
+    val nasDirName: String,
+    val nasVideoFileName: String,
     val genres: List<String> = listOf(),
-    val thumbName: String,
-    val searchableInfo: String
+    val cast: List<String> = listOf(),
+    val directors: List<String> = listOf()
 ) : Serializable
 
-val EMPTY_MOVIE = Movie("", "",  Date(0L), "", thumbName = "", videoFileName = "", searchableInfo = "")
+val EMPTY_MOVIE = Movie("", "",  Date(0L), "", "", "")

@@ -29,7 +29,7 @@ internal class DeviceImageLoaderTask(taskListener: PostTaskListener<Any>, val mo
     override fun doInBackground(vararg dirName: String): Void? {
         moviesCatalog.movies.forEachIndexed {index, movie ->
             try {
-                val filename = "${moviesCatalog.context.filesDir}/${movie.thumbName}"
+                val filename = "${moviesCatalog.context.filesDir}/${movie.deviceThumbName}"
                 movieBitmaps.add(MovieBitmap(movie, BitmapFactory.decodeFile(filename)))
                 publishProgress(index)
             }

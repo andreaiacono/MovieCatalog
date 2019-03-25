@@ -78,7 +78,11 @@ class ImageAdapter(val context: Context, val movieBitmaps: MutableList<MovieBitm
     }
 
     fun search(s: String) {
-        filteredBitmaps = movieBitmaps.filter { it.movie.searchableInfo.toLowerCase().contains(s.toLowerCase()) }.toMutableList()
+        filteredBitmaps = movieBitmaps.filter {
+            it.movie.title.toLowerCase().contains(s.toLowerCase()) ||
+            it.movie.cast.toString().toLowerCase().contains(s.toLowerCase()) ||
+            it.movie.directors.toString().toLowerCase().contains(s.toLowerCase())
+        }.toMutableList()
         sort()
         notifyDataSetChanged()
     }

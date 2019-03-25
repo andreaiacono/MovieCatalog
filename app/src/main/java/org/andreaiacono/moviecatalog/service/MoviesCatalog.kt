@@ -22,6 +22,7 @@ class MoviesCatalog(val context: Context, nasUrl: String, duneIp: String) {
 
     var genres: MutableList<String> = mutableListOf()
     var movies: MutableList<Movie> = mutableListOf()
+    var suggestions: MutableSet<String> = mutableSetOf()
     var hasNoData = false
 
     init {
@@ -56,11 +57,22 @@ class MoviesCatalog(val context: Context, nasUrl: String, duneIp: String) {
                     }
                 }
             }
+            setSuggestions()
+
             Log.d(LOG_TAG, "Movies: ${movies}")
         }
         catch (ex: Exception) {
             Log.e(LOG_TAG, "No catalog file $MOVIE_CATALOG_FILENAME on private dir.", ex)
             hasNoData = true
+        }
+    }
+
+    fun setSuggestions() {
+        suggestions.clear()
+        movies.forEach {
+            suggestions.add(it.title)
+            suggestions.addAll(it.cast)
+            suggestions.addAll(it.directors)
         }
     }
 
@@ -94,11 +106,12 @@ class MoviesCatalog(val context: Context, nasUrl: String, duneIp: String) {
                     it.title,
                     it.sortingTitle!!,
                     it.date,
+                    thumbNameNormalizer(it.title),
                     it.dirName,
                     it.videoFilename,
                     it.genres,
-                    thumbNameNormalizer(it.title),
-                    getInfoFromNasMovie(it)
+                    it.cast,
+                    it.directors
                 )
             }
             .toList()
@@ -106,8 +119,11 @@ class MoviesCatalog(val context: Context, nasUrl: String, duneIp: String) {
             movies.addAll(newMovies)
             updateGenres()
             saveCatalog()
+            setSuggestions()
         }
 
         return newMovies.size
     }
+
+    fun getSearchSuggestions(): Array<String> = suggestions.toTypedArray()
 }

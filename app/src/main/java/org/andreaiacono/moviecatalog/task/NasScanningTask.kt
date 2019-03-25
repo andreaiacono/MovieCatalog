@@ -52,7 +52,7 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
             // if there was an error in onPreExecute(), just stops here
             return null
         }
-        val existingDirNames = moviesCatalog.movies.map { it.dirName }.toList()
+        val existingDirNames = moviesCatalog.movies.map { it.nasDirName }.toList()
 
         try {
             movieDirs.forEachIndexed { index, movieDir ->
@@ -95,7 +95,7 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
                                 )
                             )
                             val thumbFilename = thumbNameNormalizer(xmlMovie.title)
-                            Log.d(LOG_TAG, "Saving $thumbFilename (dirName=${movieDir.name})")
+                            Log.d(LOG_TAG, "Saving $thumbFilename (nasDirName=${movieDir.name})")
                             moviesCatalog.saveBitmap(
                                 thumbFilename,
                                 moviesCatalog.nasService.getThumbnail(movieDir.name)
