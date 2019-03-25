@@ -20,7 +20,7 @@ class ImageAdapter(val context: Context, val movieBitmaps: MutableList<MovieBitm
     val pxWidth = (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 160f, Resources.getSystem().displayMetrics)).toInt()
     val pxHeight = (pxWidth * 1.5).toInt()
     var comparator: MovieComparator = MovieComparator.BY_DATE_ASC
-    var filteredBitmaps: List<MovieBitmap> = movieBitmaps.toMutableList()
+    var filteredBitmaps: MutableList<MovieBitmap> = movieBitmaps.toMutableList()
 
     override fun getCount(): Int = filteredBitmaps.size
 
@@ -46,10 +46,10 @@ class ImageAdapter(val context: Context, val movieBitmaps: MutableList<MovieBitm
 
     fun filterByGenre(genreFilter: String) {
         filteredBitmaps = if (genreFilter == ALL_GENRES) {
-            movieBitmaps.toList()
+            movieBitmaps.toMutableList()
         }
         else {
-            movieBitmaps.filter { it.movie.genres.contains(genreFilter) }.toList()
+            movieBitmaps.filter { it.movie.genres.contains(genreFilter) }.toMutableList()
         }
         sort()
         notifyDataSetChanged()
@@ -91,7 +91,7 @@ class ImageAdapter(val context: Context, val movieBitmaps: MutableList<MovieBitm
 
     fun deleteAll() {
         movieBitmaps.clear()
-        filteredBitmaps = listOf()
+        filteredBitmaps = mutableListOf()
     }
 }
 
