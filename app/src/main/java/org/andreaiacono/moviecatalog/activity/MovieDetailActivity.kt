@@ -2,6 +2,7 @@ package org.andreaiacono.moviecatalog.activity
 
 import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -10,14 +11,17 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.Toast
+import jcifs.smb.SmbFile
 import org.andreaiacono.moviecatalog.R
 import org.andreaiacono.moviecatalog.task.DuneHdCommanderTask
 import org.andreaiacono.moviecatalog.task.NasImageLoaderTask
 import org.andreaiacono.moviecatalog.model.Movie
+import org.andreaiacono.moviecatalog.samba.Streamer
 import org.andreaiacono.moviecatalog.service.DuneHdService
 import org.andreaiacono.moviecatalog.service.NasService
 import org.andreaiacono.moviecatalog.task.AsyncTaskType
 import org.andreaiacono.moviecatalog.task.PostTaskListener
+import java.io.File
 
 class MovieDetailActivity : PostTaskListener<Any>, AppCompatActivity() {
 
@@ -52,6 +56,7 @@ class MovieDetailActivity : PostTaskListener<Any>, AppCompatActivity() {
 
     lateinit var imageView: ImageView
     lateinit var duneHdService: DuneHdService
+    lateinit var movieSmbUrl: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -66,6 +71,7 @@ class MovieDetailActivity : PostTaskListener<Any>, AppCompatActivity() {
         movie = intent.extras.get("movie") as Movie
         val nasService = intent.extras.get("NasService") as NasService
         duneHdService = intent.extras.get("DuneHdService") as DuneHdService
+        movieSmbUrl = "${nasService.url}${movie.nasDirName}${movie.nasVideoFileName}"
         NasImageLoaderTask(this, nasService, movie.nasDirName).execute()
     }
 
@@ -90,7 +96,29 @@ class MovieDetailActivity : PostTaskListener<Any>, AppCompatActivity() {
                 DuneHdCommanderTask(this, duneHdService).execute(movie.nasDirName, movie.nasVideoFileName)
                 true
             }
+            R.id.action_smb_player -> {
+                startStreaming(movieSmbUrl)
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun startStreaming(movieSmbUrl: String) {
+        val s = Streamer.getInstance()
+        object : Thread() {
+            override fun run() {
+                val file = SmbFile(movieSmbUrl)
+                s.setStreamSrc(file, null)
+                runOnUiThread {
+                    // creates the local http URI (based on Nano) from the SMB one
+                    val uri = Uri.parse(Streamer.URL + Uri.fromFile(File(Uri.parse(movieSmbUrl).path!!)).encodedPath!!)
+                    val i = Intent(Intent.ACTION_VIEW)
+                    i.setDataAndType(uri, "video/mp4")
+                    startActivity(i)
+                }
+            }
+        }
+            .start()
     }
 }

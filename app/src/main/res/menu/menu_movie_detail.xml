@@ -4,6 +4,12 @@
     tools:context="org.andreaiacono.moviecatalog.activity.MovieDetailActivity">
 
     <item
+        android:id="@+id/action_smb_player"
+        android:layout_centerInParent="true"
+        android:icon="@drawable/ic_video_streaming"
+        android:title="@string/smb_player"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_trailer"
         android:layout_centerInParent="true"
         android:icon="@drawable/ic_action_trailer"
