@@ -3,9 +3,12 @@ package org.andreaiacono.moviecatalog.util
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.support.v4.content.res.ResourcesCompat
 import android.util.TypedValue
 import android.widget.*
 import android.view.*
+import org.andreaiacono.moviecatalog.R
 import org.andreaiacono.moviecatalog.service.ALL_GENRES
 import org.andreaiacono.moviecatalog.model.Movie
 import java.util.Comparator
@@ -34,12 +37,17 @@ class ImageAdapter(val context: Context, val movieBitmaps: MutableList<MovieBitm
             imageView = ImageView(this.context)
             imageView.layoutParams = ViewGroup.LayoutParams(pxWidth, pxHeight)
             imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-            imageView.setPadding(8, 8, 4, 16)
+            imageView.setPadding(8, 8, 8, 8)
         }
         else {
             imageView = convertView as ImageView
         }
-
+        if (movieBitmaps[position].movie.seen) {
+            imageView.setBackgroundColor(ResourcesCompat.getColor(context.resources, R.color.darkBackground, null))
+        }
+        else {
+            imageView.setBackgroundColor(Color.LTGRAY)
+        }
         imageView.setImageBitmap(this.filteredBitmaps[position].bitmap)
         return imageView
     }

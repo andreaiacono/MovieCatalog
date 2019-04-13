@@ -14,4 +14,5 @@
     <string name="action_search">Search</string>
     <string name="search_hint">Search titles, actors…</string>
     <string name="smb_player">Play on tablet</string>
+    <string name="action_mark_as_seen">Mark as seen</string>
 </resources>

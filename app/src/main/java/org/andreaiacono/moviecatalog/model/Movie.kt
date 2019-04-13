@@ -12,7 +12,8 @@ data class Movie (
     val nasVideoFileName: String,
     val genres: List<String> = listOf(),
     val cast: List<String> = listOf(),
-    val directors: List<String> = listOf()
+    val directors: List<String> = listOf(),
+    val seen: Boolean
 ) : Serializable
 
-val EMPTY_MOVIE = Movie("", "",  Date(0L), "", "", "")
+val EMPTY_MOVIE = Movie("", "",  Date(0L), "", "", "", seen = true)

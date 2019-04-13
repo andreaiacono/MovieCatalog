@@ -42,6 +42,7 @@
             android:id="@+id/moviesGridView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:verticalSpacing="6dp"
             android:layout_toRightOf="@+id/genresListView" />
 
     </RelativeLayout>

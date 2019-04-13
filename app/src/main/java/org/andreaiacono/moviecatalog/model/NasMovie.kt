@@ -53,7 +53,11 @@ data class NasMovie (
     val year: Int,
 
     val dirName: String = "",
-    val videoFilename: String = ""
+    val videoFilename: String = "",
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JacksonXmlProperty(localName = "seen")
+    val seen: Boolean = false
 )
 
 fun fromXml(xml: String): NasMovie = kotlinXmlMapper.readValue(xml, Details::class.java).movie

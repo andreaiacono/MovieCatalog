@@ -111,7 +111,8 @@ class MoviesCatalog(val context: Context, nasUrl: String, duneIp: String) {
                     it.videoFilename,
                     it.genres,
                     it.cast,
-                    it.directors
+                    it.directors,
+                    it.seen
                 )
             }
             .toList()
