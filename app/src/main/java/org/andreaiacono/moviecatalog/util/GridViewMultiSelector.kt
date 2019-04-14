@@ -6,10 +6,12 @@ import android.view.MenuItem
 import android.widget.AbsListView
 import android.widget.GridView
 import org.andreaiacono.moviecatalog.R
+import org.andreaiacono.moviecatalog.activity.MainActivity
+import org.andreaiacono.moviecatalog.model.Movie
 import org.andreaiacono.moviecatalog.service.MoviesCatalog
 
 
-class GridViewMultiSelector(val gridView: GridView, val moviesCatalog: MoviesCatalog) : AbsListView.MultiChoiceModeListener {
+class GridViewMultiSelector(val mainActivity: MainActivity, val gridView: GridView, val moviesCatalog: MoviesCatalog) : AbsListView.MultiChoiceModeListener {
 
     val LOG_TAG = this.javaClass.name
 
@@ -17,17 +19,18 @@ class GridViewMultiSelector(val gridView: GridView, val moviesCatalog: MoviesCat
         val adapter = gridView.adapter as ImageAdapter
         val checked = gridView.checkedItemPositions
         val size =  gridView.count
+        val movies = mutableListOf<Movie>()
         for (i in 0 until size) {
             if (checked.get(i)) {
                 val item = adapter.getItem(i) as MovieBitmap
-                moviesCatalog.findByNasDirname(item.movie.nasDirName)?.seen = true
-                Log.d(LOG_TAG, "Setting as seen [${item.movie.title}]")
+                val movie = moviesCatalog.findByNasDirname(item.movie.nasDirName)
+                if (movie != null) {
+                    Log.d(LOG_TAG, "Setting as seen [${item.movie.title}]")
+                    movies.add(movie)
+                }
             }
         }
-        moviesCatalog.saveCatalog()
-//        adapter.movieBitmaps.forEach { it.movie.selected = false }
-        adapter.notifyDataSetChanged()
-
+        moviesCatalog.setAsSeen(movies, mainActivity)
         mode?.finish()
         return true
     }
@@ -48,14 +51,10 @@ class GridViewMultiSelector(val gridView: GridView, val moviesCatalog: MoviesCat
             1 -> mode!!.subtitle = "1 movie selected"
             else -> mode!!.subtitle = "$selectCount movies selected"
         }
-
-//        (gridView.adapter as ImageAdapter).movieBitmaps[position].movie.selected = true
     }
 
     override fun onDestroyActionMode(mode: android.view.ActionMode?) {
         val adapter = gridView.adapter as ImageAdapter
-//        adapter.movieBitmaps.forEach { it.movie.selected = false }
         adapter.notifyDataSetChanged()
-
     }
 }

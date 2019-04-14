@@ -3,7 +3,7 @@ package org.andreaiacono.moviecatalog.model
 import java.io.Serializable
 import java.util.*
 
-data class Movie (
+data class Movie(
     val title: String,
     val sortingTitle: String,
     val date: Date,
@@ -16,4 +16,4 @@ data class Movie (
     var seen: Boolean
 ) : Serializable
 
-val EMPTY_MOVIE = Movie("", "",  Date(0L), "", "", "", seen = true)
+val EMPTY_MOVIE = Movie("", "", Date(0L), "", "", "", seen = true)

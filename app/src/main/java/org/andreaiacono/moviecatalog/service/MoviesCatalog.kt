@@ -3,10 +3,11 @@ package org.andreaiacono.moviecatalog.service
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import org.andreaiacono.moviecatalog.activity.MainActivity
 import org.andreaiacono.moviecatalog.model.Movie
 import org.andreaiacono.moviecatalog.model.NasMovie
+import org.andreaiacono.moviecatalog.task.NasMoviesUpdaterTask
 import org.andreaiacono.moviecatalog.util.MOVIE_CATALOG_FILENAME
-import org.andreaiacono.moviecatalog.util.getInfoFromNasMovie
 import org.andreaiacono.moviecatalog.util.thumbNameNormalizer
 import java.io.*
 
@@ -130,4 +131,11 @@ class MoviesCatalog(val context: Context, nasUrl: String, duneIp: String) {
     fun findByNasDirname(dirName: String): Movie? = movies.filter { it.nasDirName == dirName }.firstOrNull()
 
     fun getSearchSuggestions(): Array<String> = suggestions.toTypedArray()
+
+    fun setAsSeen(moviesToUpdate: List<Movie>, mainActivity: MainActivity) {
+        moviesToUpdate.forEach {
+            updatedMovie -> movies.find { movie -> movie.title == updatedMovie.title }?.seen = true
+        }
+        NasMoviesUpdaterTask(mainActivity, nasService, moviesToUpdate).execute()
+    }
 }

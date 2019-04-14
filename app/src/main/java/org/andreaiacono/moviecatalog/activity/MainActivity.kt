@@ -27,6 +27,7 @@ import org.andreaiacono.moviecatalog.model.Config
 import android.widget.Toast
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import org.andreaiacono.moviecatalog.model.Movie
 import org.andreaiacono.moviecatalog.util.*
 
 
@@ -73,6 +74,17 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                 AsyncTaskType.DUNE_HD_COMMANDER -> {
                     shortToast(result.toString())
                 }
+                AsyncTaskType.NAS_MOVIE_UPDATE -> {
+                    val updatedMovies = result as List<Movie>
+                    val adapterMoviesBitmaps = (gridView.adapter as ImageAdapter).movieBitmaps
+                    updatedMovies.forEach {
+                        updatedMovie -> adapterMoviesBitmaps.find {
+                            adapterMovie -> adapterMovie.movie.title == updatedMovie.title }?.movie?.seen = true
+                    }
+                    (gridView.adapter as ImageAdapter).notifyDataSetChanged()
+                    moviesCatalog.saveCatalog()
+                    shortToast("${updatedMovies.size} movies marked as seen")
+                }
                 else -> {
                 }
             }
@@ -111,7 +123,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             startActivity(fullScreenIntent)
         }
         gridView.choiceMode = GridView.CHOICE_MODE_MULTIPLE_MODAL
-        gridView.setMultiChoiceModeListener(GridViewMultiSelector(gridView, moviesCatalog))
+        gridView.setMultiChoiceModeListener(GridViewMultiSelector(this, gridView, moviesCatalog))
 
         val fileSystemProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
         DeviceImageLoaderTask(this, moviesCatalog, fileSystemProgressBar).execute()

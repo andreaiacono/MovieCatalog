@@ -42,7 +42,7 @@ class ImageAdapter(val context: Context, val movieBitmaps: MutableList<MovieBitm
         else {
             imageView = convertView as ImageView
         }
-        if (movieBitmaps[position].movie.seen) {
+        if (filteredBitmaps[position].movie.seen) {
             imageView.setBackgroundColor(ResourcesCompat.getColor(context.resources, R.color.darkBackground, null))
         }
         else {

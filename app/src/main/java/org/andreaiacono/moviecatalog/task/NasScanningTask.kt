@@ -91,7 +91,8 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
                                     xmlMovie.directors,
                                     xmlMovie.year,
                                     movieDir.name,
-                                    movieFiles[0].name
+                                    movieFiles[0].name,
+                                    xmlMovie.seen
                                 )
                             )
                             val thumbFilename = thumbNameNormalizer(xmlMovie.title)
