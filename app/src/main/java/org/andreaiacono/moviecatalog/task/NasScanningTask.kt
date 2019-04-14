@@ -55,7 +55,7 @@ internal class NasScanningTask(taskListener: PostTaskListener<Any>, val moviesCa
         val existingDirNames = moviesCatalog.movies.map { it.nasDirName }.toList()
 
         try {
-            movieDirs.forEachIndexed { index, movieDir ->
+            movieDirs.take(50).forEachIndexed { index, movieDir ->
 
                 publishProgress(index)
                 Log.d(LOG_TAG, "Reading file ${movieDir.name}")

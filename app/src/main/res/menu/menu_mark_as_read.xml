@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="org.andreaiacono.moviecatalog.activity.MovieDetailActivity">
+
+    <item
+        android:id="@+id/action_mark_as_seen"
+        android:icon="@drawable/ic_mark_as_seen"
+        android:orderInCategory="100"
+        android:title="@string/action_mark_as_seen"
+        app:showAsAction="ifRoom" />
+
+</menu>

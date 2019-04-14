@@ -36,6 +36,7 @@ class MoviesCatalog(val context: Context, nasUrl: String, duneIp: String) {
 
     fun saveCatalog() {
         val catalogFileName = "${context.filesDir}/$MOVIE_CATALOG_FILENAME"
+        movies.forEach { println("${it.title} ${it.seen}") }
         try {
             Log.d(LOG_TAG, "Saving $movies to $catalogFileName")
             ObjectOutputStream(FileOutputStream(catalogFileName)).use { it.writeObject(movies) }
@@ -58,7 +59,7 @@ class MoviesCatalog(val context: Context, nasUrl: String, duneIp: String) {
                 }
             }
             setSuggestions()
-
+            movies.forEach { println("${it.title} ${it.seen}") }
             Log.d(LOG_TAG, "Movies: ${movies}")
         }
         catch (ex: Exception) {
@@ -125,6 +126,8 @@ class MoviesCatalog(val context: Context, nasUrl: String, duneIp: String) {
 
         return newMovies.size
     }
+
+    fun findByNasDirname(dirName: String): Movie? = movies.filter { it.nasDirName == dirName }.firstOrNull()
 
     fun getSearchSuggestions(): Array<String> = suggestions.toTypedArray()
 }

@@ -12,7 +12,7 @@ import org.andreaiacono.moviecatalog.util.MovieBitmap
 
 internal class DeviceImageLoaderTask(taskListener: PostTaskListener<Any>, val moviesCatalog: MoviesCatalog, val progressBar: ProgressBar) : AsyncTask<String, Int, Void>() {
 
-    private val syncTaskType: AsyncTaskType = AsyncTaskType.FILE_SYSTEM_IMAGE_LOAD
+    private val syncTaskType: AsyncTaskType = AsyncTaskType.DEVICE_IMAGE_LOAD
 
     val LOG_TAG = this.javaClass.name
     private var exception: Exception? = null

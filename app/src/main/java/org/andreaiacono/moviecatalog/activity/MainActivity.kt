@@ -17,8 +17,6 @@ import org.andreaiacono.moviecatalog.service.MoviesCatalog
 import org.andreaiacono.moviecatalog.model.NasMovie
 import org.andreaiacono.moviecatalog.task.AsyncTaskType
 import org.andreaiacono.moviecatalog.task.PostTaskListener
-import org.andreaiacono.moviecatalog.util.ImageAdapter
-import org.andreaiacono.moviecatalog.util.MovieBitmap
 import java.io.Serializable
 import android.view.Gravity
 import android.view.View
@@ -28,9 +26,8 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import org.andreaiacono.moviecatalog.model.Config
 import android.widget.Toast
 import android.widget.AdapterView
-import org.andreaiacono.moviecatalog.util.computeColumns
-import org.andreaiacono.moviecatalog.util.getDebugInfo
 import android.widget.ArrayAdapter
+import org.andreaiacono.moviecatalog.util.*
 
 
 class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
@@ -65,7 +62,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                         shortToast("No new movies found")
                     }
                 }
-                AsyncTaskType.FILE_SYSTEM_IMAGE_LOAD -> {
+                AsyncTaskType.DEVICE_IMAGE_LOAD -> {
                     movieBitmaps = result as ArrayList<MovieBitmap>
                     if (!movieBitmaps.isEmpty()) {
                         imageAdapter = ImageAdapter(this, movieBitmaps)
@@ -113,6 +110,8 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
             fullScreenIntent.putExtra("DuneHdService", moviesCatalog.duneHdService as Serializable)
             startActivity(fullScreenIntent)
         }
+        gridView.choiceMode = GridView.CHOICE_MODE_MULTIPLE_MODAL
+        gridView.setMultiChoiceModeListener(GridViewMultiSelector(gridView, moviesCatalog))
 
         val fileSystemProgressBar: ProgressBar = findViewById(R.id.horizontalProgressBar)
         DeviceImageLoaderTask(this, moviesCatalog, fileSystemProgressBar).execute()
