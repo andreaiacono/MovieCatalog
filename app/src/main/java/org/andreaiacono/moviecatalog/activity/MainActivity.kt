@@ -95,7 +95,7 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
 
-        config = loadConfig();
+        config = loadConfig()
         moviesCatalog = MoviesCatalog(
             this,
             config.nasUrl,

@@ -8,12 +8,12 @@ import android.support.v4.content.res.ResourcesCompat
 import android.util.TypedValue
 import android.widget.*
 import android.view.*
-import org.andreaiacono.moviecatalog.R
 import org.andreaiacono.moviecatalog.service.ALL_GENRES
 import org.andreaiacono.moviecatalog.model.Movie
 import java.util.Comparator
 
-data class MovieBitmap(val movie: Movie, val bitmap: Bitmap)
+
+data class MovieBitmap(val movie: Movie, val bitmap: Bitmap, var selected: Boolean = false)
 
 
 class ImageAdapter(val context: Context, val movieBitmaps: MutableList<MovieBitmap>) : BaseAdapter() {
@@ -42,13 +42,17 @@ class ImageAdapter(val context: Context, val movieBitmaps: MutableList<MovieBitm
         else {
             imageView = convertView as ImageView
         }
+
         if (filteredBitmaps[position].movie.seen) {
-            imageView.setBackgroundColor(ResourcesCompat.getColor(context.resources, R.color.darkBackground, null))
+            imageView.setBackgroundColor(ResourcesCompat.getColor(context.resources, org.andreaiacono.moviecatalog.R.color.darkBackground, null))
         }
         else {
             imageView.setBackgroundColor(Color.LTGRAY)
         }
+
+        imageView.alpha =  if (filteredBitmaps[position].selected) 0.5f else 1f
         imageView.setImageBitmap(this.filteredBitmaps[position].bitmap)
+
         return imageView
     }
 

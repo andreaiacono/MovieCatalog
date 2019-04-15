@@ -23,6 +23,7 @@ class GridViewMultiSelector(val mainActivity: MainActivity, val gridView: GridVi
         for (i in 0 until size) {
             if (checked.get(i)) {
                 val item = adapter.getItem(i) as MovieBitmap
+                // FIXME: this call can be removed and use only the `item` val
                 val movie = moviesCatalog.findByNasDirname(item.movie.nasDirName)
                 if (movie != null) {
                     Log.d(LOG_TAG, "Setting as seen [${item.movie.title}]")
@@ -31,6 +32,8 @@ class GridViewMultiSelector(val mainActivity: MainActivity, val gridView: GridVi
             }
         }
         moviesCatalog.setAsSeen(movies, mainActivity)
+        adapter.filteredBitmaps.forEach { it.selected = false }
+        adapter.notifyDataSetChanged()
         mode?.finish()
         return true
     }
@@ -51,10 +54,15 @@ class GridViewMultiSelector(val mainActivity: MainActivity, val gridView: GridVi
             1 -> mode!!.subtitle = "1 movie selected"
             else -> mode!!.subtitle = "$selectCount movies selected"
         }
+        val adapter = gridView.adapter as ImageAdapter
+        val movieBitmap = adapter.getItem(position) as MovieBitmap
+        movieBitmap.selected = !movieBitmap.selected
+        adapter.notifyDataSetChanged()
     }
 
     override fun onDestroyActionMode(mode: android.view.ActionMode?) {
         val adapter = gridView.adapter as ImageAdapter
+        adapter.filteredBitmaps.forEach { it.selected = false }
         adapter.notifyDataSetChanged()
     }
 }
