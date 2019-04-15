@@ -19,19 +19,15 @@ class GridViewMultiSelector(val mainActivity: MainActivity, val gridView: GridVi
         val adapter = gridView.adapter as ImageAdapter
         val checked = gridView.checkedItemPositions
         val size =  gridView.count
-        val movies = mutableListOf<Movie>()
+        val selectedMovies = mutableListOf<Movie>()
         for (i in 0 until size) {
             if (checked.get(i)) {
                 val item = adapter.getItem(i) as MovieBitmap
-                // FIXME: this call can be removed and use only the `item` val
-                val movie = moviesCatalog.findByNasDirname(item.movie.nasDirName)
-                if (movie != null) {
-                    Log.d(LOG_TAG, "Setting as seen [${item.movie.title}]")
-                    movies.add(movie)
-                }
+                Log.d(LOG_TAG, "Setting as seen [${item.movie.title}]")
+                selectedMovies.add(item.movie)
             }
         }
-        moviesCatalog.setAsSeen(movies, mainActivity)
+        moviesCatalog.setAsSeen(selectedMovies, mainActivity)
         adapter.filteredBitmaps.forEach { it.selected = !it.selected }
         adapter.notifyDataSetChanged()
         mode?.finish()

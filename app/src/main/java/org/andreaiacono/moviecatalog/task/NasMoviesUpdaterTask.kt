@@ -24,7 +24,12 @@ internal class NasMoviesUpdaterTask(taskListener: PostTaskListener<Any>, val nas
                 }
                 else {
                     Log.d(LOG_TAG, "Updating seen tag")
-                    xml.replace("<seen>false</seen>", "<seen>true</seen>")
+                    if (xml.contains("<seen>false</seen>")) {
+                        xml = xml.replace("<seen>false</seen>", "<seen>true</seen>")
+                    }
+                    else {
+                        xml = xml.replace("<seen>true</seen>", "<seen>false</seen>")
+                    }
                 }
                 nasService.saveXml(it.nasDirName, xml)
             }

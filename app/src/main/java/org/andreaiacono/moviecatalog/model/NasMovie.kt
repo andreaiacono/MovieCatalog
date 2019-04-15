@@ -57,7 +57,7 @@ data class NasMovie (
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JacksonXmlProperty(localName = "seen")
-    var seen: Boolean = false
+    var seen: Boolean = true
 )
 
 fun fromXml(xml: String): NasMovie = kotlinXmlMapper.readValue(xml, Details::class.java).movie

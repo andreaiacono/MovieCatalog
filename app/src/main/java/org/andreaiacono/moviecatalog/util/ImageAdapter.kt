@@ -3,8 +3,6 @@ package org.andreaiacono.moviecatalog.util
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
-import android.graphics.Color
-import android.support.v4.content.res.ResourcesCompat
 import android.util.TypedValue
 import android.widget.*
 import android.view.*
@@ -24,7 +22,8 @@ class ImageAdapter(val context: Context, val movieBitmaps: MutableList<MovieBitm
     val pxHeight = (pxWidth * 1.5).toInt()
     var comparator: MovieComparator = MovieComparator.BY_DATE_ASC
     var filteredBitmaps: MutableList<MovieBitmap> = movieBitmaps.toMutableList()
-    var seenFilterActivated = true
+    var currentSeenFilter = false
+    var currentGenreFilter: String = ALL_GENRES
 
     override fun getCount(): Int = filteredBitmaps.size
 
@@ -44,46 +43,37 @@ class ImageAdapter(val context: Context, val movieBitmaps: MutableList<MovieBitm
             imageView = convertView as ImageView
         }
 
-        if (filteredBitmaps[position].movie.seen) {
-            imageView.setBackgroundColor(ResourcesCompat.getColor(context.resources, org.andreaiacono.moviecatalog.R.color.darkBackground, null))
-        }
-        else {
-            imageView.setBackgroundColor(Color.LTGRAY)
-        }
-
-        imageView.alpha =  if (filteredBitmaps[position].selected) 0.5f else 1f
+        imageView.alpha = if (filteredBitmaps[position].selected) 0.5f else 1f
         imageView.setImageBitmap(this.filteredBitmaps[position].bitmap)
-
         return imageView
     }
 
-    fun filterBySeen() {
-        filteredBitmaps = if (seenFilterActivated) {
-            movieBitmaps.filter { !it.movie.seen }.toMutableList()
-        } else {
-            movieBitmaps.toMutableList()
+    fun filter() {
+        filteredBitmaps = movieBitmaps.toMutableList()
+        if (currentSeenFilter) {
+            filteredBitmaps = filteredBitmaps.filter { !it.movie.seen }.toMutableList()
         }
-        seenFilterActivated = !seenFilterActivated
+        if (currentGenreFilter != ALL_GENRES) {
+            filteredBitmaps = filteredBitmaps.filter { it.movie.genres.contains(currentGenreFilter) }.toMutableList()
+        }
         sort()
         notifyDataSetChanged()
     }
 
+    fun filterBySeen() {
+        currentSeenFilter = !currentSeenFilter
+        filter()
+    }
+
     fun filterByGenre(genreFilter: String) {
-        filteredBitmaps = if (genreFilter == ALL_GENRES) {
-            movieBitmaps.toMutableList()
-        }
-        else {
-            movieBitmaps.filter { it.movie.genres.contains(genreFilter) }.toMutableList()
-        }
-        sort()
-        notifyDataSetChanged()
+        currentGenreFilter = genreFilter
+        filter()
     }
 
     fun setTitleComparator() {
         comparator = if (comparator === MovieComparator.BY_TITLE_ASC) {
             MovieComparator.BY_TITLE_DESC
-        }
-        else {
+        } else {
             MovieComparator.BY_TITLE_ASC
         }
         sort()
@@ -93,8 +83,7 @@ class ImageAdapter(val context: Context, val movieBitmaps: MutableList<MovieBitm
     fun setDateComparator() {
         comparator = if (comparator === MovieComparator.BY_DATE_ASC) {
             MovieComparator.BY_DATE_DESC
-        }
-        else {
+        } else {
             MovieComparator.BY_DATE_ASC
         }
         sort()
@@ -104,8 +93,8 @@ class ImageAdapter(val context: Context, val movieBitmaps: MutableList<MovieBitm
     fun search(s: String) {
         filteredBitmaps = movieBitmaps.filter {
             it.movie.title.toLowerCase().contains(s.toLowerCase()) ||
-            it.movie.cast.toString().toLowerCase().contains(s.toLowerCase()) ||
-            it.movie.directors.toString().toLowerCase().contains(s.toLowerCase())
+                    it.movie.cast.toString().toLowerCase().contains(s.toLowerCase()) ||
+                    it.movie.directors.toString().toLowerCase().contains(s.toLowerCase())
         }.toMutableList()
         sort()
         notifyDataSetChanged()
@@ -116,6 +105,14 @@ class ImageAdapter(val context: Context, val movieBitmaps: MutableList<MovieBitm
     fun deleteAll() {
         movieBitmaps.clear()
         filteredBitmaps = mutableListOf()
+    }
+
+    fun updateSeenState(updatedMovies: List<Movie>) {
+        updatedMovies.forEach { updatedMovie ->
+            movieBitmaps.find { adapterMovie -> adapterMovie.movie.title == updatedMovie.title }?.movie?.seen = !updatedMovie.seen
+            filteredBitmaps.find { adapterMovie -> adapterMovie.movie.title == updatedMovie.title }?.movie?.seen = !updatedMovie.seen
+        }
+        notifyDataSetChanged()
     }
 }
 

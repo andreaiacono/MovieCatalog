@@ -75,14 +75,9 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                     shortToast(result.toString())
                 }
                 AsyncTaskType.NAS_MOVIE_UPDATE -> {
+                    val adapter = gridView.adapter as ImageAdapter
                     val updatedMovies = result as List<Movie>
-                    val adapterMoviesBitmaps = (gridView.adapter as ImageAdapter).movieBitmaps
-                    updatedMovies.forEach {
-                        updatedMovie -> adapterMoviesBitmaps.find {
-                            adapterMovie -> adapterMovie.movie.title == updatedMovie.title }?.movie?.seen = true
-                    }
-                    (gridView.adapter as ImageAdapter).notifyDataSetChanged()
-                    moviesCatalog.saveCatalog()
+                    adapter.updateSeenState(updatedMovies)
                     shortToast("${updatedMovies.size} movies marked as seen")
                 }
                 else -> {
