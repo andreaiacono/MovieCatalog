@@ -213,6 +213,10 @@ class MainActivity : PostTaskListener<Any>, AppCompatActivity() {
                 imageAdapter.setDateComparator()
                 true
             }
+            R.id.action_filter_not_seen -> {
+                imageAdapter.filterBySeen()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

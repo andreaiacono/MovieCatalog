@@ -24,6 +24,7 @@ class ImageAdapter(val context: Context, val movieBitmaps: MutableList<MovieBitm
     val pxHeight = (pxWidth * 1.5).toInt()
     var comparator: MovieComparator = MovieComparator.BY_DATE_ASC
     var filteredBitmaps: MutableList<MovieBitmap> = movieBitmaps.toMutableList()
+    var seenFilterActivated = true
 
     override fun getCount(): Int = filteredBitmaps.size
 
@@ -54,6 +55,17 @@ class ImageAdapter(val context: Context, val movieBitmaps: MutableList<MovieBitm
         imageView.setImageBitmap(this.filteredBitmaps[position].bitmap)
 
         return imageView
+    }
+
+    fun filterBySeen() {
+        filteredBitmaps = if (seenFilterActivated) {
+            movieBitmaps.filter { !it.movie.seen }.toMutableList()
+        } else {
+            movieBitmaps.toMutableList()
+        }
+        seenFilterActivated = !seenFilterActivated
+        sort()
+        notifyDataSetChanged()
     }
 
     fun filterByGenre(genreFilter: String) {
