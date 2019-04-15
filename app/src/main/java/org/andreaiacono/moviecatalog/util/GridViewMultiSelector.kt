@@ -32,7 +32,7 @@ class GridViewMultiSelector(val mainActivity: MainActivity, val gridView: GridVi
             }
         }
         moviesCatalog.setAsSeen(movies, mainActivity)
-        adapter.filteredBitmaps.forEach { it.selected = false }
+        adapter.filteredBitmaps.forEach { it.selected = !it.selected }
         adapter.notifyDataSetChanged()
         mode?.finish()
         return true
